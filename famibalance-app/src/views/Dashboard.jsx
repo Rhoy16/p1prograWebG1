@@ -108,13 +108,19 @@ const Dashboard = () => {
           <h1 className="text-4xl font-extrabold text-indigo-900">Resumen Financiero</h1>
           <p className="text-gray-500 mt-2">Bienvenido a tu panel de control familiar.</p>
         </div>
-        
+        <div className="flex gap-4">
+        <Link to = "/metas" className = "hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm">
+        Metas de Ahorro
+        </Link>
         <Link 
           to="/familia" 
           className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
         >
           Gestionar Familia
         </Link>
+        </div>
+
+
       </header>
       <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
         <h2 className="text-xl font-bold text-indigo-900 mb-4">
