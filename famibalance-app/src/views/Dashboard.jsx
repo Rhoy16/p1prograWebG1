@@ -2,15 +2,21 @@ import { useState } from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import { movimientosIniciales } from "../mocks/datosFinancieros"; // Importamos el Mock
-
+import { Link } from "react-router-dom";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Dashboard = () => {
-  // 1. Guardamos los datos en el ESTADO de React para poder modificarlos después
   const [movimientos, setMovimientos] = useState(movimientosIniciales);
+
+ 
   const [nuevoMonto, setNuevoMonto] = useState("");
   const [nuevaCategoria, setNuevaCategoria] = useState("Comida");
   const [nuevoTipo, setNuevoTipo] = useState("gasto");
+  
+ 
+  const [isProcesando, setIsProcesando] = useState(false);
+
+ 
   const registrarTransaccion = (e) => {
     e.preventDefault(); 
 
@@ -29,6 +35,29 @@ const Dashboard = () => {
 
     
     setNuevoMonto("");
+  };
+  // Función para simular que esta leyendo un PDF
+  const simularLecturaPDF = (e) => {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
+
+    // Encendemos el estado de carga
+    setIsProcesando(true);
+
+    // Simulamos una demora de red/procesamiento de 2.5 segundos
+    setTimeout(() => {
+      // Autocompletamos los campos del formulario con los datos "leídos"
+      setNuevoTipo("gasto");
+      setNuevaCategoria("Servicios");
+      setNuevoMonto("150.00"); // Simulamos que leyó un recibo de luz de S/ 150
+      
+      // Apagamos el estado de carga
+      setIsProcesando(false);
+      alert("IA: Recibo analizado con éxito. Por favor, revisa y confirma los datos.");
+      
+      // Reseteamos el input file visualmente
+      e.target.value = null; 
+    }, 2500);
   };
   // 2. MATEMÁTICAS AUTOMÁTICAS (Calculamos los totales dinámicamente)
   const ingresosTotales = movimientos
@@ -68,14 +97,38 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
       {/* Encabezado */}
-      <header className="mb-8">
-        <h1 className="text-4xl font-extrabold text-indigo-900">Resumen Financiero</h1>
-        <p className="text-gray-500 mt-2">Bienvenido a tu panel de control familiar.</p>
+      {/* Encabezado con Botón de Familia */}
+      <header className="mb-8 flex justify-between items-end">
+        <div>
+          <h1 className="text-4xl font-extrabold text-indigo-900">Resumen Financiero</h1>
+          <p className="text-gray-500 mt-2">Bienvenido a tu panel de control familiar.</p>
+        </div>
+        
+        <Link 
+          to="/familia" 
+          className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
+        >
+          Gestionar Familia
+        </Link>
       </header>
       {/* Formulario de Registro Rápido (RF-06) */}
       <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
         <form onSubmit={registrarTransaccion} className="flex flex-col md:flex-row gap-4 items-end">
           
+          {/* NUEVO BOTÓN: Carga de PDF */}
+          <div className="flex-1 w-full border-r pr-4 border-gray-200">
+            <label className="block text-sm font-bold text-indigo-700 mb-1 flex items-center gap-2">
+              ✨ Auto-Llenado IA (PDF)
+            </label>
+            <input 
+              type="file" 
+              accept=".pdf"
+              onChange={simularLecturaPDF}
+              disabled={isProcesando}
+              className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer disabled:opacity-50"
+            />
+          </div>
+
           <div className="flex-1 w-full">
             <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
             <select 
@@ -116,11 +169,13 @@ const Dashboard = () => {
             />
           </div>
 
+          {/* Botón dinámico que cambia si está cargando */}
           <button 
             type="submit" 
-            className="w-full md:w-auto bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition h-[42px]"
+            disabled={isProcesando}
+            className={`w-full md:w-auto text-white font-bold py-2 px-6 rounded-lg transition h-[42px] ${isProcesando ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
           >
-            Agregar
+            {isProcesando ? 'Procesando...' : 'Agregar'}
           </button>
         </form>
       </section>
