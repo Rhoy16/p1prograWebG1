@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [isProcesando, setIsProcesando] = useState(false);
 
  
+  const [presupuesto, setPresupuesto] = useState(1000);
   const registrarTransaccion = (e) => {
     e.preventDefault(); 
 
@@ -69,6 +70,10 @@ const Dashboard = () => {
     .reduce((suma, mov) => suma + mov.monto, 0);
 
   const balanceTotal = ingresosTotales - gastosTotales;
+  const porcentajePresupuesto =
+  presupuesto > 0
+    ? (gastosTotales / presupuesto) * 100
+    : 0;
 
   // 3. PREPARAMOS EL GRÁFICO AUTOMÁTICAMENTE
   // Filtramos solo los gastos para el gráfico de torta
@@ -111,6 +116,40 @@ const Dashboard = () => {
           Gestionar Familia
         </Link>
       </header>
+      <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
+        <h2 className="text-xl font-bold text-indigo-900 mb-4">
+          Presupuesto Mensual
+        </h2>
+
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          <input
+            type="number"
+            value={presupuesto}
+            onChange={(e) => setPresupuesto(Number(e.target.value))}
+            className="border border-gray-300 rounded-lg px-3 py-2 w-full md:w-60"
+          />
+
+          <div className="font-semibold">
+            Presupuesto Actual: S/. {presupuesto.toFixed(2)}
+          </div>
+        </div>
+      </section>
+      {
+      porcentajePresupuesto >= 80 &&
+      porcentajePresupuesto < 100 && (
+        <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-xl mb-6">
+          ⚠ Atención: Has utilizado más del 80% de tu presupuesto mensual.
+        </div>
+        )
+      }
+
+      {
+      porcentajePresupuesto >= 100 && (
+        <div className="bg-red-100 border border-red-300 text-red-800 p-4 rounded-xl mb-6">
+          🚨 Has excedido el presupuesto mensual.
+        </div>
+        )
+      }
       {/* Formulario de Registro Rápido (RF-06) */}
       <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
         <form onSubmit={registrarTransaccion} className="flex flex-col md:flex-row gap-4 items-end">
@@ -180,7 +219,7 @@ const Dashboard = () => {
         </form>
       </section>
       {/* Cards Dinámicas */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition">
           <h2 className="text-sm font-bold text-gray-500 uppercase">Ingresos del Mes</h2>
           {/* Imprimimos la variable calculada */}
@@ -195,6 +234,16 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition">
           <h2 className="text-sm font-bold text-gray-500 uppercase">Balance Total</h2>
           <p className="text-3xl font-bold text-blue-600 mt-2">S/. {balanceTotal.toFixed(2)}</p>
+        </div>
+
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition">
+          <h2 className="text-sm font-bold text-gray-500 uppercase">
+            Presupuesto Usado
+          </h2>
+
+          <p className="text-3xl font-bold text-orange-500 mt-2">
+            {porcentajePresupuesto.toFixed(0)}%
+          </p>
         </div>
       </section>
 
