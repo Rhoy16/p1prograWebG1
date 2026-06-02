@@ -136,6 +136,12 @@ const Dashboard = () => {
           <p className="text-gray-500 mt-2">Bienvenido a tu panel de control familiar.</p>
         </div>
         <div className="flex gap-4">
+        <Link
+          to="/perfil"
+          className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
+        >
+          Mi Perfil
+        </Link>
         <Link to = "/metas" className = "hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm">
         Metas de Ahorro
         </Link>

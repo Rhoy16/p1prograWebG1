@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -50,6 +50,14 @@ const Login = () => {
             Ingresar
           </button>
         </form>
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600">
+            ¿No tienes cuenta?{' '}
+            <Link to="/register" className="text-indigo-600 hover:text-indigo-800 font-bold">
+              Regístrate aquí
+            </Link>
+          </p>
+        </div>
 
       </div>
     </div>
