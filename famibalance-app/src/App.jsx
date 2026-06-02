@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Landing from './views/Landing';
 import Login from './views/Login';
 import Dashboard from './views/Dashboard';
-import GrupoFamiliar from './views/GrupoFamiliar'; // 1. Importamos la nueva vista
+import GrupoFamiliar from './views/GrupoFamiliar'; 
 import Metas from './views/Metas';
 import Presupuestos from './views/Presupuestos';
 import Categorias from './views/Categorias';
@@ -12,7 +13,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/" element={<Landing />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/familia" element={<GrupoFamiliar />} /> 
