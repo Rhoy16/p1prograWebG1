@@ -89,23 +89,41 @@ const Dashboard = () => {
   const soloGastos = movimientos.filter(mov => mov.tipo === "gasto");
   
   // Agrupamos los gastos por categoría dinámicamente
-  const gastosPorCategoria = {
-    Comida: soloGastos.filter(m => m.categoria === "Comida").reduce((s, m) => s + m.monto, 0),
-    Transporte: soloGastos.filter(m => m.categoria === "Transporte").reduce((s, m) => s + m.monto, 0),
-    Estudios: soloGastos.filter(m => m.categoria === "Estudios").reduce((s, m) => s + m.monto, 0),
-    Servicios: soloGastos.filter(m => m.categoria === "Servicios").reduce((s, m) => s + m.monto, 0),
-  };
+  const gastosPorCategoria = {};
+
+  soloGastos.forEach((movimiento) => {
+    if (!gastosPorCategoria[movimiento.categoria]) {
+      gastosPorCategoria[movimiento.categoria] = 0;
+    }
+    gastosPorCategoria[movimiento.categoria] += movimiento.monto;
+  });
+
+  const colores = [
+  "#6366f1",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#06b6d4",
+  "#84cc16",
+  "#f97316",
+  "#ec4899",
+  "#14b8a6",
+  ];
 
   const dataGrafico = {
     labels: Object.keys(gastosPorCategoria),
-    datasets: [
-      {
-        label: "Gastos (S/.)",
-        data: Object.values(gastosPorCategoria), // Los datos ya no son fijos, vienen de la matemática
-        backgroundColor: ["#6366f1", "#10b981", "#f59e0b", "#ef4444"],
-        borderWidth: 1,
-      },
-    ],
+      datasets: [
+        {
+          label: "Gastos (S/.)",
+          data: Object.values(gastosPorCategoria),
+          backgroundColor: colores.slice(
+            0,
+            Object.keys(gastosPorCategoria).length
+          ),
+          borderWidth: 1,
+        },
+      ],
   };
 
   return (
