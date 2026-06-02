@@ -13,11 +13,11 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        {/* 2. Agregamos la ruta de la familia */}
         <Route path="/familia" element={<GrupoFamiliar />} /> 
         <Route path="/metas" element = {<Metas />}/>
         <Route path="/perfil" element = {<Perfil />}/>
         <Route path="/recuperar" element = {<Recuperar />}/>
+        
       </Routes>
     </BrowserRouter>
   );
