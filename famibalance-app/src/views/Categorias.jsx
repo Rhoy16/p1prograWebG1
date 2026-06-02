@@ -2,33 +2,40 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Categorias = () => {
-  const [categorias,setCategorias] = useState([
-    "Comida",
-    "Transporte",
-    "Estudios",
-    "Servicios"
-  ]);
+  const [categorias, setCategorias] = useState(() => {
+  const categoriasGuardadas = localStorage.getItem("categorias");
 
-  const [nuevaCategoria,setNuevaCategoria] = useState("");
-  const agregarCategoria = () => {
+  return categoriasGuardadas
+    ? JSON.parse(categoriasGuardadas)
+    : ["Comida", "Transporte", "Estudios", "Servicios"];
+    });
 
-    if(!nuevaCategoria.trim()) return;
+    const [nuevaCategoria,setNuevaCategoria] = useState("");
+    const agregarCategoria = () => {
 
-    setCategorias([
-      ...categorias,
-      nuevaCategoria
-    ]);
+        if (!nuevaCategoria.trim()) return;
+        const nuevasCategorias = [
+            ...categorias,
+            nuevaCategoria
+        ];
+        setCategorias(nuevasCategorias);
+        localStorage.setItem(
+            "categorias",
+            JSON.stringify(nuevasCategorias)
+        );
+        setNuevaCategoria("");
+    };
 
-    setNuevaCategoria("");
-  };
-
-  const eliminarCategoria = (categoria) => {
-    setCategorias(
-      categorias.filter(
+    const eliminarCategoria = (categoria) => {
+    const nuevasCategorias = categorias.filter(
         cat => cat !== categoria
-      )
     );
-  };
+    setCategorias(nuevasCategorias);
+    localStorage.setItem(
+        "categorias",
+        JSON.stringify(nuevasCategorias)
+        );
+    };
 
   return (
     <div className="min-h-screen p-8 bg-gray-100">

@@ -18,6 +18,15 @@ const Dashboard = () => {
 
  
   const [presupuesto, setPresupuesto] = useState(1000);
+  const categoriasGuardadas =
+  JSON.parse(localStorage.getItem("categorias")) || [
+    "Comida",
+    "Transporte",
+    "Estudios",
+    "Servicios",
+    "Sueldo"
+  ];
+
   const registrarTransaccion = (e) => {
     e.preventDefault(); 
 
@@ -212,11 +221,16 @@ const Dashboard = () => {
               onChange={(e) => setNuevaCategoria(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500"
             >
-              <option value="Comida">Comida</option>
-              <option value="Transporte">Transporte</option>
-              <option value="Estudios">Estudios</option>
-              <option value="Servicios">Servicios</option>
-              <option value="Sueldo">Sueldo / Honorarios</option>
+            {
+              categoriasGuardadas.map((categoria) => (
+                <option
+                  key={categoria}
+                  value={categoria}
+                >
+                  {categoria}
+                </option>
+              ))
+            }
             </select>
           </div>
 
