@@ -10,6 +10,7 @@ import Register from './views/Register';
 import Perfil from './views/Perfil';
 import Recuperar from './views/Recuperar';
 import Historial from './views/Historial';
+import AdminDashboard from './views/AdminDashboard'; 
 function App() {
   return (
     <BrowserRouter>
@@ -25,7 +26,7 @@ function App() {
         <Route path="/perfil" element = {<Perfil />}/>
         <Route path="/recuperar" element = {<Recuperar />}/>
         <Route path="/historial" element={<Historial />} />
-        
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </BrowserRouter>
   );
