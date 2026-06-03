@@ -15,7 +15,7 @@ const Register = () => {
     e.preventDefault();
     setError(''); // Limpiamos errores previos
 
-    // Validación 1: Que las contraseñas coincidan
+    // Validación git 1: Que las contraseñas coincidan
     if (password !== confirmarPassword) {
       setError('Las contraseñas no coinciden. Inténtalo de nuevo.');
       return;
@@ -31,7 +31,7 @@ const Register = () => {
     alert(`¡Cuenta creada con éxito para ${nombre}! Por favor, inicia sesión.`);
     
     // Redirigimos al usuario a la pantalla de Login
-    navigate('/');
+    navigate('/login');
   };
 
   return (
@@ -110,7 +110,7 @@ const Register = () => {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             ¿Ya tienes una cuenta?{' '}
-            <Link to="/" className="text-indigo-600 hover:text-indigo-800 font-bold">
+            <Link to="/login" className="text-indigo-600 hover:text-indigo-800 font-bold">
               Inicia sesión aquí
             </Link>
           </p>
