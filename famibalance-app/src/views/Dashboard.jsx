@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
 import { movimientosIniciales } from "../mocks/datosFinancieros"; // Importamos el Mock
@@ -6,9 +6,16 @@ import { Link } from "react-router-dom";
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Dashboard = () => {
-  const [movimientos, setMovimientos] = useState(movimientosIniciales);
+  const [movimientos, setMovimientos] = useState(() => {
+    const movimientosGuardados = localStorage.getItem("movimientos");
+
+    return movimientosGuardados
+      ? JSON.parse(movimientosGuardados)
+      : movimientosIniciales;
+  });
 
  
+  const [nuevoNombre, setNuevoNombre] = useState("");
   const [nuevoMonto, setNuevoMonto] = useState("");
   const [nuevaCategoria, setNuevaCategoria] = useState("Comida");
   const [nuevoTipo, setNuevoTipo] = useState("gasto");
@@ -18,6 +25,10 @@ const Dashboard = () => {
 
  
   const [presupuesto, setPresupuesto] = useState(1000);
+  useEffect(() => {
+    localStorage.setItem("movimientos", JSON.stringify(movimientos));
+  }, [movimientos]);
+
   const categoriasGuardadas =
   JSON.parse(localStorage.getItem("categorias")) || [
     "Comida",
@@ -34,6 +45,7 @@ const Dashboard = () => {
 
     const nuevoMovimiento = {
       id: Date.now(), 
+      nombre: nuevoNombre.trim() || nuevaCategoria,
       fecha: new Date().toLocaleDateString('es-PE'), 
       categoria: nuevaCategoria,
       monto: parseFloat(nuevoMonto),
@@ -45,6 +57,7 @@ const Dashboard = () => {
 
     
     setNuevoMonto("");
+    setNuevoNombre("");
   };
   // Función para simular que esta leyendo un PDF
   const simularLecturaPDF = (e) => {
@@ -59,6 +72,7 @@ const Dashboard = () => {
       // Autocompletamos los campos del formulario con los datos "leídos"
       setNuevoTipo("gasto");
       setNuevaCategoria("Servicios");
+      setNuevoNombre("Recibo de luz");
       setNuevoMonto("150.00"); // Simulamos que leyó un recibo de luz de S/ 150
       
       // Apagamos el estado de carga
@@ -172,6 +186,13 @@ const Dashboard = () => {
           Categorías
         </Link>
 
+        <Link
+          to="/historial"
+          className="bg-slate-700 text-white px-4 py-2 rounded"
+        >
+          Historial
+        </Link>
+
       </div>
 
       <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
@@ -236,6 +257,17 @@ const Dashboard = () => {
               <option value="gasto">Gasto (-)</option>
               <option value="ingreso">Ingreso (+)</option>
             </select>
+          </div>
+
+          <div className="flex-1 w-full">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+            <input
+              type="text"
+              value={nuevoNombre}
+              onChange={(e) => setNuevoNombre(e.target.value)}
+              placeholder="Ej. Recibo de luz"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500"
+            />
           </div>
 
           <div className="flex-1 w-full">
@@ -329,6 +361,7 @@ const Dashboard = () => {
               <thead>
                 <tr className="border-b border-gray-200">
                   <th className="py-3 text-gray-500">Fecha</th>
+                  <th className="py-3 text-gray-500">Nombre</th>
                   <th className="py-3 text-gray-500">Categoría</th>
                   <th className="py-3 text-gray-500">Monto</th>
                 </tr>
@@ -337,6 +370,7 @@ const Dashboard = () => {
                 {movimientos.map((movimiento) => (
                   <tr key={movimiento.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3">{movimiento.fecha}</td>
+                    <td className="py-3">{movimiento.nombre || movimiento.categoria}</td>
                     <td className="py-3">{movimiento.categoria}</td>
                     {/* Cambiamos el color dependiendo si es ingreso o gasto */}
                     <td className={`py-3 font-semibold ${movimiento.tipo === 'ingreso' ? 'text-green-500' : 'text-red-500'}`}>

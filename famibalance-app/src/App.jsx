@@ -9,6 +9,7 @@ import Categorias from './views/Categorias';
 import Register from './views/Register';
 import Perfil from './views/Perfil';
 import Recuperar from './views/Recuperar';
+import Historial from './views/Historial';
 function App() {
   return (
     <BrowserRouter>
@@ -23,6 +24,7 @@ function App() {
         <Route path="/categorias" element={<Categorias />} />
         <Route path="/perfil" element = {<Perfil />}/>
         <Route path="/recuperar" element = {<Recuperar />}/>
+        <Route path="/historial" element={<Historial />} />
         
       </Routes>
     </BrowserRouter>
