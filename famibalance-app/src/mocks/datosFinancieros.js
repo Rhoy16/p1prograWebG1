@@ -1,0 +1,17 @@
+export const movimientosIniciales = [
+  { id: 1, fecha: "20/05/2026", nombre: "Compra de mercado", categoria: "Comida", monto: 45.0, tipo: "gasto" },
+  { id: 2, fecha: "19/05/2026", nombre: "Pasajes al trabajo", categoria: "Transporte", monto: 18.0, tipo: "gasto" },
+  { id: 3, fecha: "18/05/2026", nombre: "Cuota del instituto", categoria: "Estudios", monto: 120.0, tipo: "gasto" },
+  { id: 4, fecha: "17/05/2026", nombre: "Recibo de luz", categoria: "Servicios", monto: 80.0, tipo: "gasto" },
+  { id: 5, fecha: "16/05/2026", nombre: "Almuerzo familiar", categoria: "Comida", monto: 35.0, tipo: "gasto" },
+  { id: 6, fecha: "15/05/2026", nombre: "Sueldo mensual", categoria: "Sueldo", monto: 4500.0, tipo: "ingreso" },
+  { id: 7, fecha: "14/04/2026", nombre: "Internet hogar", categoria: "Servicios", monto: 95.0, tipo: "gasto" },
+  { id: 8, fecha: "12/04/2026", nombre: "Taxi al centro", categoria: "Transporte", monto: 22.0, tipo: "gasto" },
+  { id: 9, fecha: "10/04/2026", nombre: "Materiales escolares", categoria: "Estudios", monto: 65.5, tipo: "gasto" },
+  { id: 10, fecha: "08/04/2026", nombre: "Venta ocasional", categoria: "Sueldo", monto: 240.0, tipo: "ingreso" },
+  { id: 11, fecha: "25/03/2026", nombre: "Cena fuera de casa", categoria: "Comida", monto: 78.9, tipo: "gasto" },
+  { id: 12, fecha: "21/03/2026", nombre: "Agua potable", categoria: "Servicios", monto: 52.4, tipo: "gasto" },
+  { id: 13, fecha: "15/03/2026", nombre: "Recarga de tarjeta", categoria: "Transporte", monto: 40.0, tipo: "gasto" },
+  { id: 14, fecha: "10/03/2026", nombre: "Curso virtual", categoria: "Estudios", monto: 180.0, tipo: "gasto" },
+  { id: 15, fecha: "05/03/2026", nombre: "Bono familiar", categoria: "Sueldo", monto: 350.0, tipo: "ingreso" },
+];
