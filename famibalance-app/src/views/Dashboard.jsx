@@ -141,9 +141,9 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-100 p-6">
       {/* Encabezado */}
-      {/* Encabezado con Botón de Familia */}
+      {/* Encabezado con Botón de Familia */}  
       <header className="mb-8 flex justify-between items-end">
         <div>
           <h1 className="text-4xl font-extrabold text-indigo-900">Resumen Financiero</h1>
@@ -171,7 +171,6 @@ const Dashboard = () => {
       </header>
 
       <div className="flex gap-4 mb-6">
-
         <Link
           to="/presupuestos"
           className="bg-indigo-600 text-white px-4 py-2 rounded"
@@ -191,6 +190,12 @@ const Dashboard = () => {
           className="bg-slate-700 text-white px-4 py-2 rounded"
         >
           Historial
+        </Link>
+        <Link
+          to="/prestamos"
+          className="bg-blue-700 text-white px-4 py-2 rounded"
+        >
+          Prestamos
         </Link>
 
       </div>
@@ -229,11 +234,9 @@ const Dashboard = () => {
         </div>
         )
       }
-      {/* Formulario de Registro Rápido (RF-06) */}
       <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
         <form onSubmit={registrarTransaccion} className="flex flex-col md:flex-row gap-4 items-end">
           
-          {/* NUEVO BOTÓN: Carga de PDF */}
           <div className="flex-1 w-full border-r pr-4 border-gray-200">
             <label className="block text-sm font-bold text-indigo-700 mb-1 flex items-center gap-2">
               ✨ Auto-Llenado IA (PDF)

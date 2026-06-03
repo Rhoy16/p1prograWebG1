@@ -10,10 +10,11 @@ import Register from './views/Register';
 import Perfil from './views/Perfil';
 import Recuperar from './views/Recuperar';
 import Historial from './views/Historial';
+import Prestamos from './views/Prestamos';
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
+    <BrowserRouter>    
+    <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -24,8 +25,8 @@ function App() {
         <Route path="/categorias" element={<Categorias />} />
         <Route path="/perfil" element = {<Perfil />}/>
         <Route path="/recuperar" element = {<Recuperar />}/>
-        <Route path="/historial" element={<Historial />} />
-        
+        <Route path="/historial" element={<Historial />} />    
+        <Route path="/prestamos" element={<Prestamos />} /> 
       </Routes>
     </BrowserRouter>
   );
