@@ -11,6 +11,7 @@ import Perfil from './views/Perfil';
 import Recuperar from './views/Recuperar';
 import Historial from './views/Historial';
 import Prestamos from './views/Prestamos';
+import AdminDashboard from './views/AdminDashboard'; 
 function App() {
   return (
     <BrowserRouter>    
