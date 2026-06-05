@@ -45,7 +45,7 @@ const Prestamos = () => {
             Historial de Préstamos
           </h1>
           <p className="text-gray-500 mt-2">
-            Consulta, filtra y exporta los préstamos registrados.
+            Crea, guarda y elimina los préstamos familiares.
           </p>
         </div>
         <Link

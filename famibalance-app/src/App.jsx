@@ -10,11 +10,7 @@ import Register from './views/Register';
 import Perfil from './views/Perfil';
 import Recuperar from './views/Recuperar';
 import Historial from './views/Historial';
-<<<<<<< HEAD
 import Prestamos from './views/Prestamos';
-=======
-import AdminDashboard from './views/AdminDashboard'; 
->>>>>>> b42a3768558951dc2c56b2517e543e704b027a10
 function App() {
   return (
     <BrowserRouter>    
