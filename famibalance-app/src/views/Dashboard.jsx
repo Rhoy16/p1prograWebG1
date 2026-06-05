@@ -151,6 +151,11 @@ const Dashboard = () => {
         </div>
         <div className="flex gap-4">
         <Link
+          to="/admin"
+          className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm">
+            Dashboard Familiar
+        </Link>
+        <Link
           to="/perfil"
           className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
         >

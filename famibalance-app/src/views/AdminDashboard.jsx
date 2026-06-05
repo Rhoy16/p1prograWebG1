@@ -9,7 +9,7 @@ import {
 } from "chart.js";
 
 import { Pie, Bar } from "react-chartjs-2";
-
+import { Link } from "react-router-dom";
 ChartJS.register(
   ArcElement,
   Tooltip,
@@ -77,7 +77,8 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-8">
 
-      <header className="mb-8">
+          <header className="mb-8 flex justify-between items-center">
+      <div>
         <h1 className="text-4xl font-extrabold text-indigo-900">
           Dashboard Familiar
         </h1>
@@ -85,8 +86,15 @@ const AdminDashboard = () => {
         <p className="text-gray-500 mt-2">
           Vista exclusiva para el Jefe de Familia.
         </p>
-      </header>
+      </div>
 
+      <Link
+        to="/dashboard"
+        className="bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
+      >
+        ← Volver al Dashboard
+      </Link>
+    </header>
       {/* RESUMEN GENERAL */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 

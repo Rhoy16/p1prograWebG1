@@ -28,6 +28,7 @@ function App() {
         <Route path="/recuperar" element = {<Recuperar />}/>
         <Route path="/historial" element={<Historial />} />    
         <Route path="/prestamos" element={<Prestamos />} /> 
+        <Route path="/admin" element={<AdminDashboard />} />
       </Routes>
     </BrowserRouter>
   );
