@@ -4,7 +4,7 @@ import { Pie } from "react-chartjs-2";
 import { movimientosIniciales } from "../mocks/datosFinancieros"; // Importamos el Mock
 import { Link } from "react-router-dom";
 ChartJS.register(ArcElement, Tooltip, Legend);
-
+// HOLA
 const Dashboard = () => {
   const [movimientos, setMovimientos] = useState(() => {
     const movimientosGuardados = localStorage.getItem("movimientos");
