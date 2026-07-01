@@ -2,40 +2,37 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Prestamos = () => {
-  const [deudor, setDeudor] = useState("");
-  const [acreedor, setAcreedor] = useState("");
-  const [monto, setMonto] = useState("");
-  const [concepto, setConcepto] = useState("");
-  const [prestamos, setPrestamos] = useState([]);
+  const [debtor, setDebtor] = useState("");
+  const [creditor, setCreditor] = useState("");
+  const [amount, setAmount] = useState("");
+  const [concept, setConcept] = useState("");
+  const [loans, setLoans] = useState([]);
 
-  const agregarPrestamo = (e) => {
+  const handleAddLoan = (e) => {
     e.preventDefault(); 
+    if (!debtor || !creditor || !amount) return;
 
-    if (!deudor || !acreedor || !monto) return;
-
-    const nuevo = {
+    const newLoan = {
       id: Date.now(),
-      deudor,
-      acreedor,
-      monto: Number(monto),
-      concepto,
-      fecha: new Date().toLocaleDateString(),
+      debtor,
+      creditor,
+      amount: Number(amount),
+      concept,
+      date: new Date().toLocaleDateString(),
     };
 
-    setPrestamos([...prestamos, nuevo]);
-
-    // Limpiar inputs
-    setDeudor("");
-    setAcreedor("");
-    setMonto("");
-    setConcepto("");
+    setLoans([...loans, newLoan]);
+    setDebtor("");
+    setCreditor("");
+    setAmount("");
+    setConcept("");
   };
 
-  const eliminarPrestamo = (id) => {
-    setPrestamos(prestamos.filter((p) => p.id !== id));
+  const handleDeleteLoan = (id) => {
+    setLoans(loans.filter((loan) => loan.id !== id));
   };
 
-  const total = prestamos.reduce((acc, p) => acc + p.monto, 0);
+  const totalAmount = loans.reduce((acc, loan) => acc + loan.amount, 0);
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -57,22 +54,22 @@ const Prestamos = () => {
       </header>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <form onSubmit={agregarPrestamo} className="bg-white p-5 rounded-xl shadow h-fit">
+        <form onSubmit={handleAddLoan} className="bg-white p-5 rounded-xl shadow h-fit">
           <h2 className="font-bold text-lg mb-4">Registrar préstamo</h2>
 
           <input
             className="w-full border p-2 rounded mb-3"
             placeholder="Deudor"
-            value={deudor}
-            onChange={(e) => setDeudor(e.target.value)}
+            value={debtor}
+            onChange={(e) => setDebtor(e.target.value)}
             required 
           />
 
           <input
             className="w-full border p-2 rounded mb-3"
             placeholder="Acreedor"
-            value={acreedor}
-            onChange={(e) => setAcreedor(e.target.value)}
+            value={creditor}
+            onChange={(e) => setCreditor(e.target.value)}
             required
           />
 
@@ -80,16 +77,16 @@ const Prestamos = () => {
             type="number"
             className="w-full border p-2 rounded mb-3"
             placeholder="Monto"
-            value={monto}
-            onChange={(e) => setMonto(e.target.value)}
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
             required
           />
 
           <input
             className="w-full border p-2 rounded mb-3"
             placeholder="Concepto"
-            value={concepto}
-            onChange={(e) => setConcepto(e.target.value)}
+            value={concept}
+            onChange={(e) => setConcept(e.target.value)}
           />
 
           <button
@@ -103,10 +100,10 @@ const Prestamos = () => {
         <div className="md:col-span-2 bg-white p-5 rounded-xl shadow">
           <div className="flex justify-between mb-4">
             <span className="bg-gray-200 px-3 py-1 rounded-full text-sm font-medium text-gray-700">
-              Total: {prestamos.length}
+              Total: {loans.length}
             </span>
             <span className="bg-gray-200 px-3 py-1 rounded-full text-sm font-medium text-gray-700">
-              Suma: S/. {total.toFixed(2)} 
+              Suma: S/. {totalAmount.toFixed(2)} 
             </span>
           </div>
 
@@ -121,15 +118,15 @@ const Prestamos = () => {
               </tr>
             </thead>
             <tbody>
-              {prestamos.map((p) => (
-                <tr key={p.id} className="border-b hover:bg-gray-50">
-                  <td className="p-2">{p.deudor}</td>
-                  <td className="p-2">{p.acreedor}</td>
-                  <td className="p-2">S/. {p.monto.toFixed(2)}</td>
-                  <td className="p-2">{p.concepto || "-"}</td>
+              {loans.map((loan) => (
+                <tr key={loan.id} className="border-b hover:bg-gray-50">
+                  <td className="p-2">{loan.debtor}</td>
+                  <td className="p-2">{loan.creditor}</td>
+                  <td className="p-2">S/. {loan.amount.toFixed(2)}</td>
+                  <td className="p-2">{loan.concept || "-"}</td>
                   <td className="p-2">
                     <button
-                      onClick={() => eliminarPrestamo(p.id)}
+                      onClick={() => handleDeleteLoan(loan.id)}
                       className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
                     >
                       X
@@ -138,7 +135,7 @@ const Prestamos = () => {
                 </tr>
               ))}
 
-              {prestamos.length === 0 && (
+              {loans.length === 0 && (
                 <tr>
                   <td colSpan="5" className="text-center p-4 text-gray-500">
                     No hay préstamos registrados

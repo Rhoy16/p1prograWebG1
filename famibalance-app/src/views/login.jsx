@@ -4,14 +4,13 @@ import { useNavigate, Link } from 'react-router-dom';
 const Login = () => {
   const navigate = useNavigate();
   
-  // estados para capturar lo que el usuario escribe
-  const [correo, setCorreo] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const manejarLogin = (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
     
-    console.log(`Iniciando sesión con: ${correo}`);
+    console.log(`Iniciando sesión con: ${email}`);
     navigate('/dashboard');
   };
 
@@ -24,13 +23,13 @@ const Login = () => {
           <p className="text-sm text-gray-500 mt-2">Inicia sesión en tu cuenta</p>
         </div>
 
-        <form onSubmit={manejarLogin}>
+        <form onSubmit={handleLogin}>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
             <input 
               type="email" 
-              value={correo}
-              onChange={(e) => setCorreo(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder="juan@familia.com"
               required

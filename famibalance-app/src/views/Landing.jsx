@@ -2,8 +2,7 @@ import { Link } from 'react-router-dom';
 
 const Landing = () => {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* barra de navegacion publica */}
+    <div className="min-h-screen bg-gray-55 flex flex-col">
       <nav className="bg-white shadow-sm border-b border-gray-200 px-8 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">
@@ -21,7 +20,6 @@ const Landing = () => {
         </div>
       </nav>
 
-      {/* seccion principal */}
       <main className="flex-grow flex flex-col items-center justify-center text-center px-4 py-20">
         <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight max-w-4xl">
           Toma el control de las <span className="text-indigo-600">finanzas familiares</span> de forma inteligente
@@ -36,7 +34,6 @@ const Landing = () => {
         </div>
       </main>
 
-      {/* seccion de caracteristicas */}
       <section className="bg-white py-20 px-8 border-t border-gray-200">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">¿Por qué elegir FamiBalance?</h2>
@@ -63,7 +60,6 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* pie de pagina (footer) */}
       <footer className="bg-gray-900 text-gray-400 py-8 text-center">
         <p>© 2026 FamiBalance. Proyecto de Programación Web - Grupo 1.</p>
         <p className="text-sm mt-2">Desarrollado con React y TailwindCSS</p>

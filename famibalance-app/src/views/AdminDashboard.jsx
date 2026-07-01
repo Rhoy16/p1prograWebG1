@@ -20,7 +20,7 @@ ChartJS.register(
 );
 
 const AdminDashboard = () => {
-  const gastosPorMiembro = {
+  const expensesByMember = {
     labels: ["Juan", "María", "Pedro", "Ana"],
     datasets: [
       {
@@ -36,7 +36,7 @@ const AdminDashboard = () => {
     ],
   };
 
-  const gastosPorCategoria = {
+  const expensesByCategory = {
     labels: ["Comida", "Transporte", "Servicios", "Educación"],
     datasets: [
       {
@@ -51,58 +51,59 @@ const AdminDashboard = () => {
     ],
   };
 
-  const miembros = [
+  const members = [
     {
-      nombre: "Juan Pérez",
-      rol: "Jefe de Familia",
-      gastos: "S/. 1,200",
+      id: 1,
+      name: "Juan Pérez",
+      role: "Jefe de Familia",
+      expenses: "S/. 1,200",
     },
     {
-      nombre: "María Pérez",
-      rol: "Administrador",
-      gastos: "S/. 800",
+      id: 2,
+      name: "María Pérez",
+      role: "Administrador",
+      expenses: "S/. 800",
     },
     {
-      nombre: "Pedro Pérez",
-      rol: "Miembro",
-      gastos: "S/. 650",
+      id: 3,
+      name: "Pedro Pérez",
+      role: "Miembro",
+      expenses: "S/. 650",
     },
     {
-      nombre: "Ana Pérez",
-      rol: "Miembro",
-      gastos: "S/. 400",
+      id: 4,
+      name: "Ana Pérez",
+      role: "Miembro",
+      expenses: "S/. 400",
     },
   ];
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
+      <header className="mb-8 flex justify-between items-center">
+        <div>
+          <h1 className="text-4xl font-extrabold text-indigo-900">
+            Dashboard Familiar
+          </h1>
+          <p className="text-gray-500 mt-2">
+            Vista exclusiva para el Jefe de Familia.
+          </p>
+        </div>
 
-          <header className="mb-8 flex justify-between items-center">
-      <div>
-        <h1 className="text-4xl font-extrabold text-indigo-900">
-          Dashboard Familiar
-        </h1>
+        <Link
+          to="/dashboard"
+          className="bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
+        >
+          ← Volver al Dashboard
+        </Link>
+      </header>
 
-        <p className="text-gray-500 mt-2">
-          Vista exclusiva para el Jefe de Familia.
-        </p>
-      </div>
-
-      <Link
-        to="/dashboard"
-        className="bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
-      >
-        ← Volver al Dashboard
-      </Link>
-    </header>
-      {/* RESUMEN GENERAL */}
+      {/* GENERAL SUMMARY */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-
         <div className="bg-white p-6 rounded-xl shadow-sm border">
           <h2 className="text-sm font-bold text-gray-500 uppercase">
             Ingresos Familiares
           </h2>
-
           <p className="text-3xl font-bold text-green-600 mt-2">
             S/. 15,000
           </p>
@@ -112,7 +113,6 @@ const AdminDashboard = () => {
           <h2 className="text-sm font-bold text-gray-500 uppercase">
             Gastos Familiares
           </h2>
-
           <p className="text-3xl font-bold text-red-600 mt-2">
             S/. 8,000
           </p>
@@ -122,48 +122,39 @@ const AdminDashboard = () => {
           <h2 className="text-sm font-bold text-gray-500 uppercase">
             Balance Familiar
           </h2>
-
           <p className="text-3xl font-bold text-blue-600 mt-2">
             S/. 7,000
           </p>
         </div>
-
       </section>
 
-      {/* GRAFICOS */}
+      {/* CHARTS */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-
         <div className="bg-white p-6 rounded-xl shadow-sm border">
           <h2 className="text-xl font-bold text-indigo-900 mb-4">
             Gastos por Miembro
           </h2>
-
-          <Bar data={gastosPorMiembro} />
+          <Bar data={expensesByMember} />
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border">
           <h2 className="text-xl font-bold text-indigo-900 mb-4">
             Gastos por Categoría
           </h2>
-
           <div className="w-72 mx-auto">
-            <Pie data={gastosPorCategoria} />
+            <Pie data={expensesByCategory} />
           </div>
         </div>
-
       </section>
 
-      {/* TABLA DE MIEMBROS */}
+      {/* MEMBERS TABLE */}
       <section className="bg-white p-6 rounded-xl shadow-sm border">
-
         <h2 className="text-xl font-bold text-indigo-900 mb-4">
           Resumen de Miembros
         </h2>
 
         <div className="overflow-x-auto">
-
           <table className="w-full text-left">
-
             <thead>
               <tr className="border-b">
                 <th className="py-3">Miembro</th>
@@ -171,30 +162,21 @@ const AdminDashboard = () => {
                 <th className="py-3">Gastos</th>
               </tr>
             </thead>
-
             <tbody>
-
-              {miembros.map((miembro, index) => (
+              {members.map((member) => (
                 <tr
-                  key={index}
+                  key={member.id}
                   className="border-b hover:bg-gray-50"
                 >
-                  <td className="py-3">{miembro.nombre}</td>
-
-                  <td className="py-3">{miembro.rol}</td>
-
-                  <td className="py-3">{miembro.gastos}</td>
+                  <td className="py-3">{member.name}</td>
+                  <td className="py-3">{member.role}</td>
+                  <td className="py-3">{member.expenses}</td>
                 </tr>
               ))}
-
             </tbody>
-
           </table>
-
         </div>
-
       </section>
-
     </div>
   );
 };

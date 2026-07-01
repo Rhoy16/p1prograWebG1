@@ -1,178 +1,168 @@
 import { useEffect, useState } from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
-import { movimientosIniciales } from "../mocks/datosFinancieros"; // Importamos el Mock
+import { initialTransactions } from "../mocks/datosFinancieros";
 import { Link } from "react-router-dom";
-ChartJS.register(ArcElement, Tooltip, Legend);
-// HOLA
-const Dashboard = () => {
-  const [movimientos, setMovimientos] = useState(() => {
-    const movimientosGuardados = localStorage.getItem("movimientos");
+import { PageLayout, Card, StatCard } from "../components/ui";
 
-    return movimientosGuardados
-      ? JSON.parse(movimientosGuardados)
-      : movimientosIniciales;
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+const Dashboard = () => {
+  const [transactions, setTransactions] = useState(() => {
+    const savedTransactions = localStorage.getItem("movimientos");
+    if (savedTransactions) {
+      const parsed = JSON.parse(savedTransactions);
+      return parsed.map((t) =>
+        t.monto !== undefined
+          ? {
+              id: t.id,
+              name: t.nombre,
+              date: t.fecha,
+              category: t.categoria,
+              amount: t.monto,
+              type: t.tipo,
+            }
+          : t
+      );
+    }
+    return initialTransactions;
   });
 
- 
-  const [nuevoNombre, setNuevoNombre] = useState("");
-  const [nuevoMonto, setNuevoMonto] = useState("");
-  const [nuevaCategoria, setNuevaCategoria] = useState("Comida");
-  const [nuevoTipo, setNuevoTipo] = useState("gasto");
-  
- 
-  const [isProcesando, setIsProcesando] = useState(false);
+  const [newName, setNewName] = useState("");
+  const [newAmount, setNewAmount] = useState("");
+  const [newCategory, setNewCategory] = useState("Comida");
+  const [newType, setNewType] = useState("gasto");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [budget, setBudget] = useState(1000);
 
- 
-  const [presupuesto, setPresupuesto] = useState(1000);
   useEffect(() => {
-    localStorage.setItem("movimientos", JSON.stringify(movimientos));
-  }, [movimientos]);
+    localStorage.setItem("movimientos", JSON.stringify(transactions));
+  }, [transactions]);
 
-  const categoriasGuardadas =
-  JSON.parse(localStorage.getItem("categorias")) || [
-    "Comida",
-    "Transporte",
-    "Estudios",
-    "Servicios",
-    "Sueldo"
-  ];
+  const [categories] = useState(() =>
+    JSON.parse(localStorage.getItem("categorias")) || [
+      "Comida",
+      "Transporte",
+      "Estudios",
+      "Servicios",
+      "Sueldo"
+    ]
+  );
 
-  const registrarTransaccion = (e) => {
+  const handleRegisterTransaction = (e) => {
     e.preventDefault(); 
+    if (!newAmount || isNaN(newAmount)) return; 
 
-    if (!nuevoMonto || isNaN(nuevoMonto)) return; 
-
-    const nuevoMovimiento = {
+    const newTransaction = {
       id: Date.now(), 
-      nombre: nuevoNombre.trim() || nuevaCategoria,
-      fecha: new Date().toLocaleDateString('es-PE'), 
-      categoria: nuevaCategoria,
-      monto: parseFloat(nuevoMonto),
-      tipo: nuevoTipo
+      name: newName.trim() || newCategory,
+      date: new Date().toLocaleDateString('es-PE'), 
+      category: newCategory,
+      amount: parseFloat(newAmount),
+      type: newType
     };
 
-    
-    setMovimientos([nuevoMovimiento, ...movimientos]); 
-
-    
-    setNuevoMonto("");
-    setNuevoNombre("");
+    setTransactions([newTransaction, ...transactions]); 
+    setNewAmount("");
+    setNewName("");
   };
-  // Función para simular que esta leyendo un PDF
-  const simularLecturaPDF = (e) => {
-    const archivo = e.target.files[0];
-    if (!archivo) return;
 
-    // Encendemos el estado de carga
-    setIsProcesando(true);
+  const handleSimulatePDFRead = (e) => {
+    if (!e.target.files || !e.target.files[0]) return;
+    const file = e.target.files[0];
 
-    // Simulamos una demora de red/procesamiento de 2.5 segundos
+    setIsProcessing(true);
+
+    // Simulate network/processing delay of 2.5 seconds
     setTimeout(() => {
-      // Autocompletamos los campos del formulario con los datos "leídos"
-      setNuevoTipo("gasto");
-      setNuevaCategoria("Servicios");
-      setNuevoNombre("Recibo de luz");
-      setNuevoMonto("150.00"); // Simulamos que leyó un recibo de luz de S/ 150
+      setNewType("gasto");
+      setNewCategory("Servicios");
+      setNewName("Recibo de luz");
+      setNewAmount("150.00"); // Simulate reading a light bill of S/ 150
       
-      // Apagamos el estado de carga
-      setIsProcesando(false);
+      setIsProcessing(false);
       alert("IA: Recibo analizado con éxito. Por favor, revisa y confirma los datos.");
-      
-      // Reseteamos el input file visualmente
       e.target.value = null; 
     }, 2500);
   };
-  // 2. MATEMÁTICAS AUTOMÁTICAS (Calculamos los totales dinámicamente)
-  const ingresosTotales = movimientos
-    .filter(mov => mov.tipo === "ingreso")
-    .reduce((suma, mov) => suma + mov.monto, 0);
 
-  const gastosTotales = movimientos
-    .filter(mov => mov.tipo === "gasto")
-    .reduce((suma, mov) => suma + mov.monto, 0);
+  const totalIncome = transactions
+    .filter(t => t.type === "ingreso")
+    .reduce((sum, t) => sum + t.amount, 0);
 
-  const balanceTotal = ingresosTotales - gastosTotales;
-  const porcentajePresupuesto =
-  presupuesto > 0
-    ? (gastosTotales / presupuesto) * 100
-    : 0;
+  const totalExpenses = transactions
+    .filter(t => t.type === "gasto")
+    .reduce((sum, t) => sum + t.amount, 0);
 
-  // 3. PREPARAMOS EL GRÁFICO AUTOMÁTICAMENTE
-  // Filtramos solo los gastos para el gráfico de torta
-  const soloGastos = movimientos.filter(mov => mov.tipo === "gasto");
-  
-  // Agrupamos los gastos por categoría dinámicamente
-  const gastosPorCategoria = {};
+  const totalBalance = totalIncome - totalExpenses;
 
-  soloGastos.forEach((movimiento) => {
-    if (!gastosPorCategoria[movimiento.categoria]) {
-      gastosPorCategoria[movimiento.categoria] = 0;
+  const budgetPercentage = budget > 0 ? (totalExpenses / budget) * 100 : 0;
+
+  const onlyExpenses = transactions.filter(t => t.type === "gasto");
+  const expensesByCategory = {};
+
+  onlyExpenses.forEach((t) => {
+    if (!expensesByCategory[t.category]) {
+      expensesByCategory[t.category] = 0;
     }
-    gastosPorCategoria[movimiento.categoria] += movimiento.monto;
+    expensesByCategory[t.category] += t.amount;
   });
 
-  const colores = [
-  "#6366f1",
-  "#10b981",
-  "#f59e0b",
-  "#ef4444",
-  "#8b5cf6",
-  "#06b6d4",
-  "#84cc16",
-  "#f97316",
-  "#ec4899",
-  "#14b8a6",
+  const colors = [
+    "#6366f1",
+    "#10b981",
+    "#f59e0b",
+    "#ef4444",
+    "#8b5cf6",
+    "#06b6d4",
+    "#84cc16",
+    "#f97316",
+    "#ec4899",
+    "#14b8a6",
   ];
 
-  const dataGrafico = {
-    labels: Object.keys(gastosPorCategoria),
-      datasets: [
-        {
-          label: "Gastos (S/.)",
-          data: Object.values(gastosPorCategoria),
-          backgroundColor: colores.slice(
-            0,
-            Object.keys(gastosPorCategoria).length
-          ),
-          borderWidth: 1,
-        },
-      ],
+  const chartData = {
+    labels: Object.keys(expensesByCategory),
+    datasets: [
+      {
+        label: "Gastos (S/.)",
+        data: Object.values(expensesByCategory),
+        backgroundColor: colors.slice(0, Object.keys(expensesByCategory).length),
+        borderWidth: 1,
+      },
+    ],
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      {/* Encabezado */}
-      {/* Encabezado con Botón de Familia */}  
+    <PageLayout className="!p-6">
       <header className="mb-8 flex justify-between items-end">
         <div>
           <h1 className="text-4xl font-extrabold text-indigo-900">Resumen Financiero</h1>
           <p className="text-gray-500 mt-2">Bienvenido a tu panel de control familiar.</p>
         </div>
         <div className="flex gap-4">
-        <Link
-          to="/admin"
-          className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm">
+          <Link
+            to="/admin"
+            className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
+          >
             Dashboard Familiar
-        </Link>
-        <Link
-          to="/perfil"
-          className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
-        >
-          Mi Perfil
-        </Link>
-        <Link to = "/metas" className = "hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm">
-        Metas de Ahorro
-        </Link>
-        <Link 
-          to="/familia" 
-          className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
-        >
-          Gestionar Familia
-        </Link>
+          </Link>
+          <Link
+            to="/perfil"
+            className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
+          >
+            Mi Perfil
+          </Link>
+          <Link to="/metas" className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm">
+            Metas de Ahorro
+          </Link>
+          <Link 
+            to="/familia" 
+            className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
+          >
+            Gestionar Familia
+          </Link>
         </div>
-
-
       </header>
 
       <div className="flex gap-4 mb-6">
@@ -182,14 +172,12 @@ const Dashboard = () => {
         >
           Presupuestos
         </Link>
-
         <Link
           to="/categorias"
           className="bg-green-600 text-white px-4 py-2 rounded"
         >
           Categorías
         </Link>
-
         <Link
           to="/historial"
           className="bg-slate-700 text-white px-4 py-2 rounded"
@@ -202,46 +190,39 @@ const Dashboard = () => {
         >
           Prestamos
         </Link>
-
       </div>
 
-      <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
+      <Card className="mb-8">
         <h2 className="text-xl font-bold text-indigo-900 mb-4">
           Presupuesto Mensual
         </h2>
-
         <div className="flex flex-col md:flex-row gap-4 items-center">
           <input
             type="number"
-            value={presupuesto}
-            onChange={(e) => setPresupuesto(Number(e.target.value))}
+            value={budget}
+            onChange={(e) => setBudget(Number(e.target.value))}
             className="border border-gray-300 rounded-lg px-3 py-2 w-full md:w-60"
           />
-
           <div className="font-semibold">
-            Presupuesto Actual: S/. {presupuesto.toFixed(2)}
+            Presupuesto Actual: S/. {budget.toFixed(2)}
           </div>
         </div>
-      </section>
-      {
-      porcentajePresupuesto >= 80 &&
-      porcentajePresupuesto < 100 && (
+      </Card>
+
+      {budgetPercentage >= 80 && budgetPercentage < 100 && (
         <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-xl mb-6">
           ⚠ Atención: Has utilizado más del 80% de tu presupuesto mensual.
         </div>
-        )
-      }
+      )}
 
-      {
-      porcentajePresupuesto >= 100 && (
+      {budgetPercentage >= 100 && (
         <div className="bg-red-100 border border-red-300 text-red-800 p-4 rounded-xl mb-6">
           🚨 Has excedido el presupuesto mensual.
         </div>
-        )
-      }
-      <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-8">
-        <form onSubmit={registrarTransaccion} className="flex flex-col md:flex-row gap-4 items-end">
-          
+      )}
+
+      <Card className="mb-8">
+        <form onSubmit={handleRegisterTransaction} className="flex flex-col md:flex-row gap-4 items-end">
           <div className="flex-1 w-full border-r pr-4 border-gray-200">
             <label className="block text-sm font-bold text-indigo-700 mb-1 flex items-center gap-2">
               ✨ Auto-Llenado IA (PDF)
@@ -249,8 +230,8 @@ const Dashboard = () => {
             <input 
               type="file" 
               accept=".pdf"
-              onChange={simularLecturaPDF}
-              disabled={isProcesando}
+              onChange={handleSimulatePDFRead}
+              disabled={isProcessing}
               className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer disabled:opacity-50"
             />
           </div>
@@ -258,8 +239,8 @@ const Dashboard = () => {
           <div className="flex-1 w-full">
             <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
             <select 
-              value={nuevoTipo}
-              onChange={(e) => setNuevoTipo(e.target.value)}
+              value={newType}
+              onChange={(e) => setNewType(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500"
             >
               <option value="gasto">Gasto (-)</option>
@@ -271,8 +252,8 @@ const Dashboard = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
             <input
               type="text"
-              value={nuevoNombre}
-              onChange={(e) => setNuevoNombre(e.target.value)}
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
               placeholder="Ej. Recibo de luz"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500"
             />
@@ -281,20 +262,15 @@ const Dashboard = () => {
           <div className="flex-1 w-full">
             <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
             <select 
-              value={nuevaCategoria}
-              onChange={(e) => setNuevaCategoria(e.target.value)}
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500"
             >
-            {
-              categoriasGuardadas.map((categoria) => (
-                <option
-                  key={categoria}
-                  value={categoria}
-                >
-                  {categoria}
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
                 </option>
-              ))
-            }
+              ))}
             </select>
           </div>
 
@@ -303,66 +279,56 @@ const Dashboard = () => {
             <input 
               type="number" 
               step="0.01"
-              value={nuevoMonto}
-              onChange={(e) => setNuevoMonto(e.target.value)}
+              value={newAmount}
+              onChange={(e) => setNewAmount(e.target.value)}
               placeholder="Ej. 50.00"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500"
               required
             />
           </div>
 
-          {/* Botón dinámico que cambia si está cargando */}
           <button 
             type="submit" 
-            disabled={isProcesando}
-            className={`w-full md:w-auto text-white font-bold py-2 px-6 rounded-lg transition h-[42px] ${isProcesando ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+            disabled={isProcessing}
+            className={`w-full md:w-auto text-white font-bold py-2 px-6 rounded-lg transition h-[42px] ${isProcessing ? 'bg-gray-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
           >
-            {isProcesando ? 'Procesando...' : 'Agregar'}
+            {isProcessing ? 'Procesando...' : 'Agregar'}
           </button>
         </form>
-      </section>
-      {/* Cards Dinámicas */}
+      </Card>
+
       <section className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition">
-          <h2 className="text-sm font-bold text-gray-500 uppercase">Ingresos del Mes</h2>
-          {/* Imprimimos la variable calculada */}
-          <p className="text-3xl font-bold text-green-600 mt-2">S/. {ingresosTotales.toFixed(2)}</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition">
-          <h2 className="text-sm font-bold text-gray-500 uppercase">Gastos del Mes</h2>
-          <p className="text-3xl font-bold text-red-600 mt-2">S/. {gastosTotales.toFixed(2)}</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition">
-          <h2 className="text-sm font-bold text-gray-500 uppercase">Balance Total</h2>
-          <p className="text-3xl font-bold text-blue-600 mt-2">S/. {balanceTotal.toFixed(2)}</p>
-        </div>
-
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition">
-          <h2 className="text-sm font-bold text-gray-500 uppercase">
-            Presupuesto Usado
-          </h2>
-
-          <p className="text-3xl font-bold text-orange-500 mt-2">
-            {porcentajePresupuesto.toFixed(0)}%
-          </p>
-        </div>
+        <StatCard
+          title="Ingresos del Mes"
+          value={`S/. ${totalIncome.toFixed(2)}`}
+          valueColor="text-green-600"
+        />
+        <StatCard
+          title="Gastos del Mes"
+          value={`S/. ${totalExpenses.toFixed(2)}`}
+          valueColor="text-red-600"
+        />
+        <StatCard
+          title="Balance Total"
+          value={`S/. ${totalBalance.toFixed(2)}`}
+          valueColor="text-blue-600"
+        />
+        <StatCard
+          title="Presupuesto Usado"
+          value={`${budgetPercentage.toFixed(0)}%`}
+          valueColor="text-orange-500"
+        />
       </section>
 
-      {/* GRAFICO + TABLA */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        {/* GRAFICO DINÁMICO */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+        <Card>
           <h2 className="text-xl font-bold text-indigo-900 mb-4">Gastos por Categoría</h2>
           <div className="w-72 mx-auto">
-            <Pie data={dataGrafico} />
+            <Pie data={chartData} />
           </div>
-        </div>
+        </Card>
 
-        {/* MOVIMIENTOS DINÁMICOS */}
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+        <Card>
           <h2 className="text-xl font-bold text-indigo-900 mb-4">Movimientos Recientes</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
@@ -375,24 +341,22 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {movimientos.map((movimiento) => (
-                  <tr key={movimiento.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-3">{movimiento.fecha}</td>
-                    <td className="py-3">{movimiento.nombre || movimiento.categoria}</td>
-                    <td className="py-3">{movimiento.categoria}</td>
-                    {/* Cambiamos el color dependiendo si es ingreso o gasto */}
-                    <td className={`py-3 font-semibold ${movimiento.tipo === 'ingreso' ? 'text-green-500' : 'text-red-500'}`}>
-                      {movimiento.tipo === 'ingreso' ? '+' : '-'} S/. {movimiento.monto.toFixed(2)}
+                {transactions.map((transaction) => (
+                  <tr key={transaction.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3">{transaction.date}</td>
+                    <td className="py-3">{transaction.name || transaction.category}</td>
+                    <td className="py-3">{transaction.category}</td>
+                    <td className={`py-3 font-semibold ${transaction.type === 'ingreso' ? 'text-green-500' : 'text-red-500'}`}>
+                      {transaction.type === 'ingreso' ? '+' : '-'} S/. {transaction.amount.toFixed(2)}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </div>
-
+        </Card>
       </section>
-    </div>
+    </PageLayout>
   );
 };
 

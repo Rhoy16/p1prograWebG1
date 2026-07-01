@@ -1,97 +1,108 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { movimientosIniciales } from "../mocks/datosFinancieros";
+import { initialTransactions } from "../mocks/datosFinancieros";
 
-const meses = [
-  { valor: "", texto: "Todos los meses" },
-  { valor: "01", texto: "Enero" },
-  { valor: "02", texto: "Febrero" },
-  { valor: "03", texto: "Marzo" },
-  { valor: "04", texto: "Abril" },
-  { valor: "05", texto: "Mayo" },
-  { valor: "06", texto: "Junio" },
-  { valor: "07", texto: "Julio" },
-  { valor: "08", texto: "Agosto" },
-  { valor: "09", texto: "Septiembre" },
-  { valor: "10", texto: "Octubre" },
-  { valor: "11", texto: "Noviembre" },
-  { valor: "12", texto: "Diciembre" },
+const months = [
+  { value: "", text: "Todos los meses" },
+  { value: "01", text: "Enero" },
+  { value: "02", text: "Febrero" },
+  { value: "03", text: "Marzo" },
+  { value: "04", text: "Abril" },
+  { value: "05", text: "Mayo" },
+  { value: "06", text: "Junio" },
+  { value: "07", text: "Julio" },
+  { value: "08", text: "Agosto" },
+  { value: "09", text: "Septiembre" },
+  { value: "10", text: "Octubre" },
+  { value: "11", text: "Noviembre" },
+  { value: "12", text: "Diciembre" },
 ];
 
-const registrosPorPagina = 10;
+const recordsPerPage = 10;
 
-const obtenerMes = (fecha) => {
-  const partes = fecha.split("/");
-  return partes[1] || "";
+const getMonth = (date) => {
+  const parts = date.split("/");
+  return parts[1] || "";
 };
 
 const Historial = () => {
-  const [busqueda, setBusqueda] = useState("");
-  const [mes, setMes] = useState("");
-  const [categoria, setCategoria] = useState("");
-  const [paginaActual, setPaginaActual] = useState(1);
+  const [search, setSearch] = useState("");
+  const [month, setMonth] = useState("");
+  const [category, setCategory] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const movimientos = useMemo(() => {
-    const movimientosGuardados = localStorage.getItem("movimientos");
-    return movimientosGuardados
-      ? JSON.parse(movimientosGuardados)
-      : movimientosIniciales;
+  const transactions = useMemo(() => {
+    const savedTransactions = localStorage.getItem("movimientos");
+    if (savedTransactions) {
+      const parsed = JSON.parse(savedTransactions);
+      return parsed.map((t) =>
+        t.monto !== undefined
+          ? {
+              id: t.id,
+              name: t.nombre,
+              date: t.fecha,
+              category: t.categoria,
+              amount: t.monto,
+              type: t.tipo,
+            }
+          : t
+      );
+    }
+    return initialTransactions;
   }, []);
 
-  const categorias = useMemo(() => {
-    return [...new Set(movimientos.map((movimiento) => movimiento.categoria))];
-  }, [movimientos]);
+  const categories = useMemo(() => {
+    return [...new Set(transactions.map((t) => t.category))];
+  }, [transactions]);
 
-  const movimientosFiltrados = useMemo(() => {
-    const textoBusqueda = busqueda.toLowerCase().trim();
+  const filteredTransactions = useMemo(() => {
+    const searchText = search.toLowerCase().trim();
 
-    return movimientos.filter((movimiento) => {
-      const nombre = (movimiento.nombre || movimiento.categoria).toLowerCase();
-      const coincideTexto = nombre.includes(textoBusqueda);
-      const coincideMes = mes ? obtenerMes(movimiento.fecha) === mes : true;
-      const coincideCategoria = categoria
-        ? movimiento.categoria === categoria
-        : true;
+    return transactions.filter((t) => {
+      const name = (t.name || t.category).toLowerCase();
+      const matchesText = name.includes(searchText);
+      const matchesMonth = month ? getMonth(t.date) === month : true;
+      const matchesCategory = category ? t.category === category : true;
 
-      return coincideTexto && coincideMes && coincideCategoria;
+      return matchesText && matchesMonth && matchesCategory;
     });
-  }, [busqueda, categoria, mes, movimientos]);
+  }, [search, category, month, transactions]);
 
-  const totalPaginas = Math.max(
+  const totalPages = Math.max(
     1,
-    Math.ceil(movimientosFiltrados.length / registrosPorPagina)
+    Math.ceil(filteredTransactions.length / recordsPerPage)
   );
-  const paginaSegura = Math.min(paginaActual, totalPaginas);
-  const inicio = (paginaSegura - 1) * registrosPorPagina;
-  const movimientosVisibles = movimientosFiltrados.slice(
-    inicio,
-    inicio + registrosPorPagina
+  const safePage = Math.min(currentPage, totalPages);
+  const startIndex = (safePage - 1) * recordsPerPage;
+  const visibleTransactions = filteredTransactions.slice(
+    startIndex,
+    startIndex + recordsPerPage
   );
 
-  const actualizarFiltro = (callback) => {
+  const handleFilterUpdate = (callback) => {
     callback();
-    setPaginaActual(1);
+    setCurrentPage(1);
   };
 
-  const exportarReporte = () => {
-    const encabezados = ["Fecha", "Nombre", "Categoria", "Tipo", "Monto"];
-    const filas = movimientosVisibles.map((movimiento) => [
-      movimiento.fecha,
-      movimiento.nombre || movimiento.categoria,
-      movimiento.categoria,
-      movimiento.tipo,
-      movimiento.monto.toFixed(2),
+  const handleExportReport = () => {
+    const headers = ["Fecha", "Nombre", "Categoria", "Tipo", "Monto"];
+    const rows = visibleTransactions.map((t) => [
+      t.date,
+      t.name || t.category,
+      t.category,
+      t.type,
+      t.amount.toFixed(2),
     ]);
-    const contenido = [encabezados, ...filas]
-      .map((fila) => fila.map((valor) => `"${valor}"`).join(","))
+    const content = [headers, ...rows]
+      .map((row) => row.map((val) => `"${val}"`).join(","))
       .join("\n");
-    const archivo = new Blob([contenido], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(archivo);
-    const enlace = document.createElement("a");
+    const file = new Blob([content], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(file);
+    const link = document.createElement("a");
 
-    enlace.href = url;
-    enlace.download = "reporte-historial.csv";
-    enlace.click();
+    link.href = url;
+    link.download = "reporte-historial.csv";
+    link.click();
     URL.revokeObjectURL(url);
   };
 
@@ -123,9 +134,9 @@ const Historial = () => {
             </label>
             <input
               type="text"
-              value={busqueda}
+              value={search}
               onChange={(e) =>
-                actualizarFiltro(() => setBusqueda(e.target.value))
+                handleFilterUpdate(() => setSearch(e.target.value))
               }
               placeholder="Ej. mercado"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500"
@@ -137,13 +148,13 @@ const Historial = () => {
               Mes
             </label>
             <select
-              value={mes}
-              onChange={(e) => actualizarFiltro(() => setMes(e.target.value))}
+              value={month}
+              onChange={(e) => handleFilterUpdate(() => setMonth(e.target.value))}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500"
             >
-              {meses.map((item) => (
-                <option key={item.texto} value={item.valor}>
-                  {item.texto}
+              {months.map((item) => (
+                <option key={item.text} value={item.value}>
+                  {item.text}
                 </option>
               ))}
             </select>
@@ -154,14 +165,14 @@ const Historial = () => {
               Categoria
             </label>
             <select
-              value={categoria}
+              value={category}
               onChange={(e) =>
-                actualizarFiltro(() => setCategoria(e.target.value))
+                handleFilterUpdate(() => setCategory(e.target.value))
               }
               className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500"
             >
               <option value="">Todas las categorias</option>
-              {categorias.map((item) => (
+              {categories.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
@@ -171,7 +182,7 @@ const Historial = () => {
 
           <div className="flex items-end">
             <button
-              onClick={exportarReporte}
+              onClick={handleExportReport}
               className="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition"
             >
               Exportar visible
@@ -186,7 +197,7 @@ const Historial = () => {
             Movimientos encontrados
           </h2>
           <span className="text-sm text-gray-500">
-            {movimientosFiltrados.length} registro(s)
+            {filteredTransactions.length} registro(s)
           </span>
         </div>
 
@@ -202,31 +213,31 @@ const Historial = () => {
               </tr>
             </thead>
             <tbody>
-              {movimientosVisibles.map((movimiento) => (
+              {visibleTransactions.map((t) => (
                 <tr
-                  key={movimiento.id}
+                  key={t.id}
                   className="border-b border-gray-100 hover:bg-gray-50"
                 >
-                  <td className="py-3">{movimiento.fecha}</td>
+                  <td className="py-3">{t.date}</td>
                   <td className="py-3">
-                    {movimiento.nombre || movimiento.categoria}
+                    {t.name || t.category}
                   </td>
-                  <td className="py-3">{movimiento.categoria}</td>
-                  <td className="py-3 capitalize">{movimiento.tipo}</td>
+                  <td className="py-3">{t.category}</td>
+                  <td className="py-3 capitalize">{t.type}</td>
                   <td
                     className={`py-3 font-semibold ${
-                      movimiento.tipo === "ingreso"
+                      t.type === "ingreso"
                         ? "text-green-500"
                         : "text-red-500"
                     }`}
                   >
-                    {movimiento.tipo === "ingreso" ? "+" : "-"} S/.{" "}
-                    {movimiento.monto.toFixed(2)}
+                    {t.type === "ingreso" ? "+" : "-"} S/.{" "}
+                    {t.amount.toFixed(2)}
                   </td>
                 </tr>
               ))}
 
-              {movimientosVisibles.length === 0 && (
+              {visibleTransactions.length === 0 && (
                 <tr>
                   <td colSpan="5" className="py-6 text-center text-gray-500">
                     No hay movimientos para los filtros seleccionados.
@@ -239,25 +250,25 @@ const Historial = () => {
 
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-6">
           <p className="text-sm text-gray-500">
-            Pagina {paginaSegura} de {totalPaginas}. Se muestran hasta 10
+            Pagina {safePage} de {totalPages}. Se muestran hasta 10
             registros.
           </p>
 
           <div className="flex gap-2">
             <button
               onClick={() =>
-                setPaginaActual((pagina) => Math.max(1, pagina - 1))
+                setCurrentPage((page) => Math.max(1, page - 1))
               }
-              disabled={paginaSegura === 1}
+              disabled={safePage === 1}
               className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 disabled:opacity-50"
             >
               Anterior
             </button>
             <button
               onClick={() =>
-                setPaginaActual((pagina) => Math.min(totalPaginas, pagina + 1))
+                setCurrentPage((page) => Math.min(totalPages, page + 1))
               }
-              disabled={paginaSegura === totalPaginas}
+              disabled={safePage === totalPages}
               className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 disabled:opacity-50"
             >
               Siguiente
