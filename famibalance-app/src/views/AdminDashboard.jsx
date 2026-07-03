@@ -1,23 +1,5 @@
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-} from "chart.js";
-
 import { Pie, Bar } from "react-chartjs-2";
 import { Link } from "react-router-dom";
-ChartJS.register(
-  ArcElement,
-  Tooltip,
-  Legend,
-  CategoryScale,
-  LinearScale,
-  BarElement
-);
 
 const AdminDashboard = () => {
   const expensesByMember = {
