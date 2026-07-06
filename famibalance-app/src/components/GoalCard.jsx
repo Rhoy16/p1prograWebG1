@@ -21,7 +21,7 @@ const GoalCard = ({ goal }) => {
           style={{ width: `${percentage > 100 ? 100 : percentage}%` }}
         ></div>
       </div>
-      <p className="text-xs text-gray-500 mt-1">
+      <p className="text-xs text-gray-700 mt-1">
         {percentage.toFixed(1)}% completado
       </p>
     </li>

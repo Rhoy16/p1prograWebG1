@@ -18,17 +18,17 @@ const Recuperar = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+    <main className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <section className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
         
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-indigo-900">FamiBalance</h1>
-          <p className="text-sm text-gray-500 mt-2">Recupera el acceso a tu cuenta</p>
+          <p className="text-sm text-gray-700 mt-2">Recupera el acceso a tu cuenta</p>
         </div>
 
         {isSent ? (
           <div className="text-center">
-            <div className="bg-green-100 border border-green-300 text-green-800 p-4 rounded-lg mb-6 text-sm">
+            <div className="bg-green-100 border border-green-300 text-green-800 p-4 rounded-lg mb-6 text-sm" role="alert" aria-live="assertive">
               ¡Listo! Hemos enviado un enlace con un <b>token temporal</b> a <b>{email}</b> para que puedas restablecer tu contraseña. Revisa tu bandeja de entrada.
             </div>
             <Link to="/" className="w-full inline-block bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
@@ -70,8 +70,8 @@ const Recuperar = () => {
           </form>
         )}
 
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

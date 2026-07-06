@@ -26,8 +26,8 @@ const Categorias = () => {
   };
 
   return (
-    <div className="min-h-screen p-8 bg-gray-100">
-      <div className="flex justify-between items-center mb-6">
+    <main className="min-h-screen p-8 bg-gray-100">
+      <nav className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">
           Gestión de Categorías
         </h1>
@@ -37,7 +37,7 @@ const Categorias = () => {
         >
           Volver al Dashboard
         </Link>
-      </div>
+      </nav>
 
       <div className="flex gap-3 mb-6">
         <input
@@ -69,7 +69,7 @@ const Categorias = () => {
           </button>
         </div>
       ))}
-    </div>
+    </main>
   );
 };
 

@@ -31,7 +31,7 @@ const Historial = () => {
   const [category, setCategory] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const transactions = useMemo(() => {
+  const [transactions] = useState(() => {
     const savedTransactions = localStorage.getItem("movimientos");
     if (savedTransactions) {
       const parsed = JSON.parse(savedTransactions);
@@ -49,7 +49,7 @@ const Historial = () => {
       );
     }
     return initialTransactions;
-  }, []);
+  });
 
   const categories = useMemo(() => {
     return [...new Set(transactions.map((t) => t.category))];
@@ -107,13 +107,13 @@ const Historial = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 p-8">
       <header className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div>
           <h1 className="text-4xl font-extrabold text-indigo-900">
             Historial de Movimientos
           </h1>
-          <p className="text-gray-500 mt-2">
+          <p className="text-gray-700 mt-2">
             Consulta, filtra y exporta los movimientos registrados.
           </p>
         </div>
@@ -196,7 +196,7 @@ const Historial = () => {
           <h2 className="text-xl font-bold text-indigo-900">
             Movimientos encontrados
           </h2>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-gray-700">
             {filteredTransactions.length} registro(s)
           </span>
         </div>
@@ -205,11 +205,11 @@ const Historial = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-gray-200">
-                <th className="py-3 text-gray-500">Fecha</th>
-                <th className="py-3 text-gray-500">Nombre</th>
-                <th className="py-3 text-gray-500">Categoria</th>
-                <th className="py-3 text-gray-500">Tipo</th>
-                <th className="py-3 text-gray-500">Monto</th>
+                <th scope="col" className="py-3 text-gray-700">Fecha</th>
+                <th scope="col" className="py-3 text-gray-700">Nombre</th>
+                <th scope="col" className="py-3 text-gray-700">Categoria</th>
+                <th scope="col" className="py-3 text-gray-700">Tipo</th>
+                <th scope="col" className="py-3 text-gray-700">Monto</th>
               </tr>
             </thead>
             <tbody>
@@ -227,8 +227,8 @@ const Historial = () => {
                   <td
                     className={`py-3 font-semibold ${
                       t.type === "ingreso"
-                        ? "text-green-500"
-                        : "text-red-500"
+                        ? "text-green-600"
+                        : "text-red-600"
                     }`}
                   >
                     {t.type === "ingreso" ? "+" : "-"} S/.{" "}
@@ -239,7 +239,7 @@ const Historial = () => {
 
               {visibleTransactions.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="py-6 text-center text-gray-500">
+                  <td colSpan="5" className="py-6 text-center text-gray-700">
                     No hay movimientos para los filtros seleccionados.
                   </td>
                 </tr>
@@ -249,7 +249,7 @@ const Historial = () => {
         </div>
 
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-6">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-700">
             Pagina {safePage} de {totalPages}. Se muestran hasta 10
             registros.
           </p>
@@ -276,7 +276,7 @@ const Historial = () => {
           </div>
         </div>
       </section>
-    </div>
+    </main>
   );
 };
 

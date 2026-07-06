@@ -15,12 +15,12 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+    <main className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <section className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
         
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-indigo-900">FamiBalance</h1>
-          <p className="text-sm text-gray-500 mt-2">Inicia sesión en tu cuenta</p>
+          <p className="text-sm text-gray-700 mt-2">Inicia sesión en tu cuenta</p>
         </div>
 
         <form onSubmit={handleLogin}>
@@ -70,8 +70,8 @@ const Login = () => {
           </p>
         </div>
 
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

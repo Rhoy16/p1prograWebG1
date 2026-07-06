@@ -1,19 +1,28 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const Profile = () => {
-  // Simulate logged-in user data
+const Perfil = () => {
   const [name, setName] = useState('Juan Pérez');
   const [email, setEmail] = useState('juan@familia.com');
+  const [originalName, setOriginalName] = useState('Juan Pérez');
+  const [originalEmail, setOriginalEmail] = useState('juan@familia.com');
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setOriginalName(name);
+    setOriginalEmail(email);
     setIsEditing(false);
     setMessage('Perfil actualizado correctamente');
     
     setTimeout(() => setMessage(''), 3000);
+  };
+
+  const handleCancel = () => {
+    setName(originalName);
+    setEmail(originalEmail);
+    setIsEditing(false);
   };
 
   const handlePhotoChange = (e) => {
@@ -25,7 +34,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 p-8">
       <nav className="mb-8 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-200">
         <h1 className="text-2xl font-bold text-indigo-900">Mi Perfil</h1>
         <Link to="/dashboard" className="text-indigo-600 hover:text-indigo-800 font-semibold">
@@ -33,10 +42,10 @@ const Profile = () => {
         </Link>
       </nav>
 
-      <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
+      <section className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
         
         {message && (
-          <div className="bg-green-100 border border-green-300 text-green-800 p-3 rounded-lg mb-6 text-sm text-center">
+          <div className="bg-green-100 border border-green-300 text-green-800 p-3 rounded-lg mb-6 text-sm text-center" role="alert" aria-live="assertive">
             {message}
           </div>
         )}
@@ -90,7 +99,7 @@ const Profile = () => {
               <>
                 <button 
                   type="button" 
-                  onClick={() => setIsEditing(false)}
+                  onClick={handleCancel}
                   className="w-1/2 bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded-lg hover:bg-gray-300 transition"
                 >
                   Cancelar
@@ -105,9 +114,9 @@ const Profile = () => {
             )}
           </div>
         </form>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 
-export default Profile;
+export default Perfil;

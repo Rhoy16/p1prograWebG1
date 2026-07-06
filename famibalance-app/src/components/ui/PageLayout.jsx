@@ -9,9 +9,9 @@
  */
 const PageLayout = ({ children, className = "" }) => {
   return (
-    <div className={`min-h-screen bg-gray-100 p-8 ${className}`}>
+    <main className={`min-h-screen bg-gray-100 p-8 ${className}`}>
       {children}
-    </div>
+    </main>
   );
 };
 

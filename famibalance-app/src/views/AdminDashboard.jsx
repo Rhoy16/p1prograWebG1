@@ -61,13 +61,13 @@ const AdminDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 p-8">
       <header className="mb-8 flex justify-between items-center">
         <div>
           <h1 className="text-4xl font-extrabold text-indigo-900">
             Dashboard Familiar
           </h1>
-          <p className="text-gray-500 mt-2">
+          <p className="text-gray-700 mt-2">
             Vista exclusiva para el Jefe de Familia.
           </p>
         </div>
@@ -83,7 +83,7 @@ const AdminDashboard = () => {
       {/* GENERAL SUMMARY */}
       <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl shadow-sm border">
-          <h2 className="text-sm font-bold text-gray-500 uppercase">
+          <h2 className="text-sm font-bold text-gray-700 uppercase">
             Ingresos Familiares
           </h2>
           <p className="text-3xl font-bold text-green-600 mt-2">
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border">
-          <h2 className="text-sm font-bold text-gray-500 uppercase">
+          <h2 className="text-sm font-bold text-gray-700 uppercase">
             Gastos Familiares
           </h2>
           <p className="text-3xl font-bold text-red-600 mt-2">
@@ -101,7 +101,7 @@ const AdminDashboard = () => {
         </div>
 
         <div className="bg-white p-6 rounded-xl shadow-sm border">
-          <h2 className="text-sm font-bold text-gray-500 uppercase">
+          <h2 className="text-sm font-bold text-gray-700 uppercase">
             Balance Familiar
           </h2>
           <p className="text-3xl font-bold text-blue-600 mt-2">
@@ -112,21 +112,21 @@ const AdminDashboard = () => {
 
       {/* CHARTS */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white p-6 rounded-xl shadow-sm border">
+        <section className="bg-white p-6 rounded-xl shadow-sm border">
           <h2 className="text-xl font-bold text-indigo-900 mb-4">
             Gastos por Miembro
           </h2>
           <Bar data={expensesByMember} />
-        </div>
+        </section>
 
-        <div className="bg-white p-6 rounded-xl shadow-sm border">
+        <section className="bg-white p-6 rounded-xl shadow-sm border">
           <h2 className="text-xl font-bold text-indigo-900 mb-4">
             Gastos por Categoría
           </h2>
           <div className="w-72 mx-auto">
             <Pie data={expensesByCategory} />
           </div>
-        </div>
+        </section>
       </section>
 
       {/* MEMBERS TABLE */}
@@ -139,9 +139,9 @@ const AdminDashboard = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b">
-                <th className="py-3">Miembro</th>
-                <th className="py-3">Rol</th>
-                <th className="py-3">Gastos</th>
+                <th scope="col" className="py-3">Miembro</th>
+                <th scope="col" className="py-3">Rol</th>
+                <th scope="col" className="py-3">Gastos</th>
               </tr>
             </thead>
             <tbody>
@@ -159,7 +159,7 @@ const AdminDashboard = () => {
           </table>
         </div>
       </section>
-    </div>
+    </main>
   );
 };
 

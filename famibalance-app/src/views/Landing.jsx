@@ -24,7 +24,7 @@ const Landing = () => {
         <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight max-w-4xl">
           Toma el control de las <span className="text-indigo-600">finanzas familiares</span> de forma inteligente
         </h1>
-        <p className="text-xl text-gray-500 mb-10 max-w-2xl">
+        <p className="text-xl text-gray-700 mb-10 max-w-2xl">
           Gestiona presupuestos, registra gastos con inteligencia artificial y alcanza tus metas de ahorro junto a los que más quieres. Todo en un solo lugar.
         </p>
         <div className="flex gap-4">

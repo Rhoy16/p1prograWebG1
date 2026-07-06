@@ -7,13 +7,13 @@
  * @param {React.ReactNode} children — Contenido de la tarjeta
  * @param {string} [className] — Clases adicionales (ej. "mb-8", "hover:shadow-md")
  */
-const Card = ({ children, className = "" }) => {
+const Card = ({ children, className = "", as: Tag = "div" }) => {
   return (
-    <div
+    <Tag
       className={`bg-white p-6 rounded-2xl shadow-sm border border-gray-200 ${className}`}
     >
       {children}
-    </div>
+    </Tag>
   );
 };
 

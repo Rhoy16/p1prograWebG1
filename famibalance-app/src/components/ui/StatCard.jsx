@@ -13,7 +13,7 @@ import Card from "./Card";
 const StatCard = ({ title, value, valueColor = "text-green-600", className = "" }) => {
   return (
     <Card className={`hover:shadow-md transition ${className}`}>
-      <h2 className="text-sm font-bold text-gray-500 uppercase">{title}</h2>
+      <h2 className="text-sm font-bold text-gray-700 uppercase">{title}</h2>
       <p className={`text-3xl font-bold ${valueColor} mt-2`}>{value}</p>
     </Card>
   );

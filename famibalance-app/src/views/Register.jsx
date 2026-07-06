@@ -9,6 +9,7 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -27,27 +28,32 @@ const Register = () => {
     }
 
     // Simulate registration
-    alert(`¡Cuenta creada con éxito para ${name}! Por favor, inicia sesión.`);
+    setSuccessMessage(`¡Cuenta creada con éxito para ${name}! Por favor, inicia sesión.`);
     
-    navigate('/login');
+    setTimeout(() => navigate('/login'), 2000);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
+    <main className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <section className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
         
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-indigo-900">FamiBalance</h1>
-          <p className="text-sm text-gray-500 mt-2">Crea tu cuenta para empezar</p>
+          <p className="text-sm text-gray-700 mt-2">Crea tu cuenta para empezar</p>
         </div>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-sm">
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4 text-sm" role="alert" aria-live="assertive">
             {error}
           </div>
         )}
 
         <form onSubmit={handleRegister}>
+          {successMessage && (
+            <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl mb-4 text-sm" role="alert" aria-live="assertive">
+              {successMessage}
+            </div>
+          )}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
             <input 
@@ -113,8 +119,8 @@ const Register = () => {
           </p>
         </div>
 
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

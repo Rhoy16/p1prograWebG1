@@ -19,6 +19,8 @@ const GrupoFamiliar = () => {
   ]);
 
   const [newEmail, setNewEmail] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [confirmModal, setConfirmModal] = useState({ open: false, memberId: null, memberName: "" });
 
   const handleInviteMember = (e) => {
     e.preventDefault();
@@ -32,16 +34,21 @@ const GrupoFamiliar = () => {
     };
 
     setMembers([...members, newMember]);
-    alert("¡Invitación enviada con éxito a " + newEmail + "!");
+    setSuccessMessage("¡Invitación enviada con éxito a " + newEmail + "!");
+    setTimeout(() => setSuccessMessage(""), 3000);
     setNewEmail("");
   };
 
   const handleDeleteMember = (id) => {
     const member = members.find((m) => m.id === id);
-    if (window.confirm(`¿Deseas eliminar a ${member.nombre}?`)) {
-      setMembers(members.filter((m) => m.id !== id));
-      alert("Miembro eliminado correctamente");
-    }
+    setConfirmModal({ open: true, memberId: id, memberName: member.nombre });
+  };
+
+  const confirmDeleteMember = () => {
+    setMembers(members.filter((m) => m.id !== confirmModal.memberId));
+    setConfirmModal({ open: false, memberId: null, memberName: "" });
+    setSuccessMessage("Miembro eliminado correctamente");
+    setTimeout(() => setSuccessMessage(""), 3000);
   };
 
   const handlePromoteMember = (id) => {
@@ -50,11 +57,12 @@ const GrupoFamiliar = () => {
         m.id === id ? { ...m, rol: "Administrador" } : m
       )
     );
-    alert("Miembro ascendido a Administrador");
+    setSuccessMessage("Miembro ascendido a Administrador");
+    setTimeout(() => setSuccessMessage(""), 3000);
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 p-8">
       <nav className="mb-8 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-200">
         <h1 className="text-2xl font-bold text-indigo-900">
           Gestión de Familia
@@ -67,12 +75,18 @@ const GrupoFamiliar = () => {
         </Link>
       </nav>
 
+      {successMessage && (
+        <div className="bg-green-50 border border-green-200 text-green-800 p-3 rounded-xl mb-6 text-sm" role="alert" aria-live="assertive">
+          {successMessage}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 lg:col-span-1 h-fit">
+        <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 lg:col-span-1 h-fit">
           <h2 className="text-lg font-bold text-gray-800 mb-4">
             Invitar nuevo miembro
           </h2>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-700 mb-4">
             Ingresa el correo de tu familiar para enviarle un enlace de acceso al grupo.
           </p>
 
@@ -92,9 +106,9 @@ const GrupoFamiliar = () => {
               Enviar Invitación
             </button>
           </form>
-        </div>
+        </section>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 lg:col-span-2">
+        <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 lg:col-span-2">
           <h2 className="text-lg font-bold text-gray-800 mb-4">
             Miembros Actuales ({members.length})
           </h2>
@@ -109,7 +123,7 @@ const GrupoFamiliar = () => {
                   <p className="font-bold text-gray-800">
                     {member.nombre}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-700">
                     {member.correo}
                   </p>
                 </div>
@@ -132,12 +146,14 @@ const GrupoFamiliar = () => {
                       <button
                         onClick={() => handlePromoteMember(member.id)}
                         className="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600"
+                        aria-label="Ascender miembro"
                       >
                         Ascender
                       </button>
                       <button
                         onClick={() => handleDeleteMember(member.id)}
                         className="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600"
+                        aria-label="Eliminar miembro"
                       >
                         Eliminar
                       </button>
@@ -147,9 +163,34 @@ const GrupoFamiliar = () => {
               </div>
             ))}
           </div>
-        </div>
+        </section>
       </div>
-    </div>
+
+      {confirmModal.open && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Confirmar eliminación</h3>
+            <p className="text-sm text-gray-700 mb-6">
+              ¿Deseas eliminar a <span className="font-semibold">{confirmModal.memberName}</span> del grupo familiar?
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setConfirmModal({ open: false, memberId: null, memberName: "" })}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition font-medium"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmDeleteMember}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition font-medium"
+              >
+                Confirmar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
   );
 };
 

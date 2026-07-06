@@ -4,6 +4,19 @@ import { initialTransactions } from "../mocks/datosFinancieros";
 import { Link } from "react-router-dom";
 import { PageLayout, Card, StatCard } from "../components/ui";
 
+const COLORS = [
+  "#6366f1",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#06b6d4",
+  "#84cc16",
+  "#f97316",
+  "#ec4899",
+  "#14b8a6",
+];
+
 const Dashboard = () => {
   const [transactions, setTransactions] = useState(() => {
     const savedTransactions = localStorage.getItem("movimientos");
@@ -31,6 +44,7 @@ const Dashboard = () => {
   const [newType, setNewType] = useState("gasto");
   const [isProcessing, setIsProcessing] = useState(false);
   const [budget, setBudget] = useState(1000);
+  const [iaMessage, setIaMessage] = useState("");
 
   useEffect(() => {
     localStorage.setItem("movimientos", JSON.stringify(transactions));
@@ -78,7 +92,8 @@ const Dashboard = () => {
       setNewAmount("150.00"); // Simulate reading a light bill of S/ 150
       
       setIsProcessing(false);
-      alert("IA: Recibo analizado con éxito. Por favor, revisa y confirma los datos.");
+      setIaMessage("IA: Recibo analizado con éxito. Por favor, revisa y confirma los datos.");
+      setTimeout(() => setIaMessage(""), 3000);
       e.target.value = null; 
     }, 2500);
   };
@@ -96,27 +111,10 @@ const Dashboard = () => {
   const budgetPercentage = budget > 0 ? (totalExpenses / budget) * 100 : 0;
 
   const onlyExpenses = transactions.filter(t => t.type === "gasto");
-  const expensesByCategory = {};
-
-  onlyExpenses.forEach((t) => {
-    if (!expensesByCategory[t.category]) {
-      expensesByCategory[t.category] = 0;
-    }
-    expensesByCategory[t.category] += t.amount;
-  });
-
-  const colors = [
-    "#6366f1",
-    "#10b981",
-    "#f59e0b",
-    "#ef4444",
-    "#8b5cf6",
-    "#06b6d4",
-    "#84cc16",
-    "#f97316",
-    "#ec4899",
-    "#14b8a6",
-  ];
+  const expensesByCategory = onlyExpenses.reduce((acc, t) => {
+    acc[t.category] = (acc[t.category] || 0) + t.amount;
+    return acc;
+  }, {});
 
   const chartData = {
     labels: Object.keys(expensesByCategory),
@@ -124,7 +122,7 @@ const Dashboard = () => {
       {
         label: "Gastos (S/.)",
         data: Object.values(expensesByCategory),
-        backgroundColor: colors.slice(0, Object.keys(expensesByCategory).length),
+        backgroundColor: COLORS.slice(0, Object.keys(expensesByCategory).length),
         borderWidth: 1,
       },
     ],
@@ -135,9 +133,9 @@ const Dashboard = () => {
       <header className="mb-8 flex justify-between items-end">
         <div>
           <h1 className="text-4xl font-extrabold text-indigo-900">Resumen Financiero</h1>
-          <p className="text-gray-500 mt-2">Bienvenido a tu panel de control familiar.</p>
+          <p className="text-gray-700 mt-2">Bienvenido a tu panel de control familiar.</p>
         </div>
-        <div className="flex gap-4">
+        <nav className="flex gap-4">
           <Link
             to="/admin"
             className="hidden md:block bg-white text-indigo-600 font-bold py-2 px-4 rounded-lg border border-indigo-200 hover:bg-indigo-50 transition shadow-sm"
@@ -159,10 +157,10 @@ const Dashboard = () => {
           >
             Gestionar Familia
           </Link>
-        </div>
+        </nav>
       </header>
 
-      <div className="flex gap-4 mb-6">
+      <nav className="flex gap-4 mb-6">
         <Link
           to="/presupuestos"
           className="bg-indigo-600 text-white px-4 py-2 rounded"
@@ -187,7 +185,7 @@ const Dashboard = () => {
         >
           Prestamos
         </Link>
-      </div>
+      </nav>
 
       <Card className="mb-8">
         <h2 className="text-xl font-bold text-indigo-900 mb-4">
@@ -206,14 +204,20 @@ const Dashboard = () => {
         </div>
       </Card>
 
+      {iaMessage && (
+        <div className="bg-green-50 border border-green-200 text-green-800 p-3 rounded-xl mb-6 text-sm" role="alert" aria-live="assertive">
+          {iaMessage}
+        </div>
+      )}
+
       {budgetPercentage >= 80 && budgetPercentage < 100 && (
-        <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-xl mb-6">
+        <div className="bg-yellow-100 border border-yellow-300 text-yellow-800 p-4 rounded-xl mb-6" role="alert" aria-live="assertive">
           ⚠ Atención: Has utilizado más del 80% de tu presupuesto mensual.
         </div>
       )}
 
       {budgetPercentage >= 100 && (
-        <div className="bg-red-100 border border-red-300 text-red-800 p-4 rounded-xl mb-6">
+        <div className="bg-red-100 border border-red-300 text-red-800 p-4 rounded-xl mb-6" role="alert" aria-live="assertive">
           🚨 Has excedido el presupuesto mensual.
         </div>
       )}
@@ -318,23 +322,23 @@ const Dashboard = () => {
       </section>
 
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+        <Card as="section">
           <h2 className="text-xl font-bold text-indigo-900 mb-4">Gastos por Categoría</h2>
           <div className="w-72 mx-auto">
             <Pie data={chartData} />
           </div>
         </Card>
 
-        <Card>
+        <Card as="section">
           <h2 className="text-xl font-bold text-indigo-900 mb-4">Movimientos Recientes</h2>
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-gray-200">
-                  <th className="py-3 text-gray-500">Fecha</th>
-                  <th className="py-3 text-gray-500">Nombre</th>
-                  <th className="py-3 text-gray-500">Categoría</th>
-                  <th className="py-3 text-gray-500">Monto</th>
+                  <th scope="col" className="py-3 text-gray-700">Fecha</th>
+                  <th scope="col" className="py-3 text-gray-700">Nombre</th>
+                  <th scope="col" className="py-3 text-gray-700">Categoría</th>
+                  <th scope="col" className="py-3 text-gray-700">Monto</th>
                 </tr>
               </thead>
               <tbody>
@@ -343,7 +347,7 @@ const Dashboard = () => {
                     <td className="py-3">{transaction.date}</td>
                     <td className="py-3">{transaction.name || transaction.category}</td>
                     <td className="py-3">{transaction.category}</td>
-                    <td className={`py-3 font-semibold ${transaction.type === 'ingreso' ? 'text-green-500' : 'text-red-500'}`}>
+                    <td className={`py-3 font-semibold ${transaction.type === 'ingreso' ? 'text-green-600' : 'text-red-600'}`}>
                       {transaction.type === 'ingreso' ? '+' : '-'} S/. {transaction.amount.toFixed(2)}
                     </td>
                   </tr>

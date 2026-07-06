@@ -24,7 +24,7 @@ const Metas = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <main className="min-h-screen bg-gray-100 p-8">
       <nav className="mb-8 flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-gray-200">
         <h1 className="text-2xl font-bold text-indigo-900">Gestión de Ahorros</h1>
         <Link to="/dashboard" className="text-indigo-600 hover:text-indigo-800 font-semibold">
@@ -32,7 +32,7 @@ const Metas = () => {
         </Link>
       </nav>
 
-      <div className="min-h-screen bg-gray-100 p-8">
+      <section className="min-h-screen bg-gray-100 p-8">
         <h2 className="text-lg font-bold text-gray-800 mb-4">Cree una meta de ahorro: </h2>
         <form className="space-y-3">
           <input
@@ -83,8 +83,8 @@ const Metas = () => {
             return <GoalCard key={goal.name} goal={goal} />;
           })}
         </ul>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

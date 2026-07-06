@@ -24,8 +24,8 @@ const Presupuestos = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="flex justify-between items-center mb-8">
+    <main className="min-h-screen bg-gray-100 p-8">
+      <nav className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-indigo-900">
           Presupuestos por Categoría
         </h1>
@@ -35,7 +35,7 @@ const Presupuestos = () => {
         >
           Volver al Dashboard
         </Link>
-      </div>
+      </nav>
 
       {Object.keys(budgets).map((category) => {
         const budget = budgets[category];
@@ -71,7 +71,7 @@ const Presupuestos = () => {
               ></div>
             </div>
 
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-gray-700">
               {percentage.toFixed(0)}% utilizado
             </p>
 
@@ -89,7 +89,7 @@ const Presupuestos = () => {
           </div>
         );
       })}
-    </div>
+    </main>
   );
 };
 
