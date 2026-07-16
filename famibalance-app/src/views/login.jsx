@@ -1,17 +1,25 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { api, AUTH_TOKEN_KEY } from '../services/api';
 
 const Login = () => {
   const navigate = useNavigate();
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleLogin = (e) => {
+ const handleLogin = async (e) => {
     e.preventDefault();
-    
-    console.log(`Iniciando sesión con: ${email}`);
-    navigate('/dashboard');
+    setError('');
+    try {
+      const { data } = await api.post('/auth/login', { email, password });
+      localStorage.setItem(AUTH_TOKEN_KEY, data.token);
+      localStorage.setItem('famibalance_user', JSON.stringify(data.user));
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message || 'Credenciales inválidas');
+    }
   };
 
   return (
@@ -24,6 +32,9 @@ const Login = () => {
         </div>
 
         <form onSubmit={handleLogin}>
+          {error && (
+            <p className="text-red-600 text-sm mb-4 text-center">{error}</p>
+          )}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
             <input 

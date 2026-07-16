@@ -2,19 +2,26 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const Perfil = () => {
-  const [name, setName] = useState('Juan Pérez');
-  const [email, setEmail] = useState('juan@familia.com');
-  const [originalName, setOriginalName] = useState('Juan Pérez');
-  const [originalEmail, setOriginalEmail] = useState('juan@familia.com');
+  // Load user data from localStorage (saved during login)
+  const storedUser = JSON.parse(localStorage.getItem('famibalance_user') || '{}');
+
+  const [name, setName] = useState(storedUser.name || '');
+  const [email, setEmail] = useState(storedUser.email || '');
+  const [originalName, setOriginalName] = useState(storedUser.name || '');
+  const [originalEmail, setOriginalEmail] = useState(storedUser.email || '');
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Note: the backend does not have a PUT /user/profile endpoint yet,
+    // so we only update localStorage for now and keep the UI consistent.
+    const updatedUser = { ...storedUser, name, email };
+    localStorage.setItem('famibalance_user', JSON.stringify(updatedUser));
     setOriginalName(name);
     setOriginalEmail(email);
     setIsEditing(false);
-    setMessage('Perfil actualizado correctamente');
+    setMessage('Perfil actualizado correctamente (local)');
     
     setTimeout(() => setMessage(''), 3000);
   };
@@ -52,13 +59,19 @@ const Perfil = () => {
 
         <div className="flex flex-col items-center mb-8">
           <div className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-500 text-3xl font-bold mb-4">
-            {name.charAt(0)}
+            {name.charAt(0).toUpperCase()}
           </div>
           
           <label className="cursor-pointer text-sm text-indigo-600 font-semibold hover:text-indigo-800">
             Cambiar foto
             <input type="file" className="hidden" accept="image/*" onChange={handlePhotoChange} />
           </label>
+
+          {storedUser.role && (
+            <span className="mt-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">
+              {storedUser.role}
+            </span>
+          )}
         </div>
 
         <form onSubmit={handleSubmit}>

@@ -1,20 +1,28 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { api } from '../services/api';
 
 const Recuperar = () => {
   const [email, setEmail] = useState('');
   const [isSent, setIsSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleRecovery = (e) => {
+  const handleRecovery = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
 
-    // Simulate network delay and sending recovery email with token (RF-03)
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      await api.post('/auth/recover', { email });
       setIsSent(true);
-    }, 2000);
+    } catch (err) {
+      // The backend always returns the same message for security,
+      // so we still show success to avoid leaking which emails exist.
+      setIsSent(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -25,6 +33,12 @@ const Recuperar = () => {
           <h1 className="text-2xl font-bold text-indigo-900">FamiBalance</h1>
           <p className="text-sm text-gray-700 mt-2">Recupera el acceso a tu cuenta</p>
         </div>
+
+        {error && (
+          <div className="bg-red-100 border border-red-300 text-red-800 p-3 rounded-lg mb-4 text-sm" role="alert">
+            {error}
+          </div>
+        )}
 
         {isSent ? (
           <div className="text-center">

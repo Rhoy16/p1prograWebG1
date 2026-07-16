@@ -1,65 +1,62 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getFamilyMembers, createFamily } from "../services/family.service";
 
 const GrupoFamiliar = () => {
-  // Initial state simulating a user database
-  const [members, setMembers] = useState([
-    {
-      id: 1,
-      nombre: "Juan Pérez",
-      rol: "Jefe de Familia",
-      correo: "juan@familia.com",
-    },
-    {
-      id: 2,
-      nombre: "María Gómez",
-      rol: "Miembro",
-      correo: "maria@familia.com",
-    },
-  ]);
-
-  const [newEmail, setNewEmail] = useState("");
+  const [members, setMembers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [confirmModal, setConfirmModal] = useState({ open: false, memberId: null, memberName: "" });
+  const [hasFamily, setHasFamily] = useState(false);
 
-  const handleInviteMember = (e) => {
+  // Create-family form
+  const [familyName, setFamilyName] = useState("");
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await getFamilyMembers();
+        setMembers(data);
+        setHasFamily(true);
+      } catch (err) {
+        // If the user has no family yet, the endpoint may fail
+        if (err.status === 400 || err.status === 404) {
+          setHasFamily(false);
+        } else {
+          setError(err.message || "Error al cargar miembros");
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  const handleCreateFamily = async (e) => {
     e.preventDefault();
-    if (!newEmail) return;
-
-    const newMember = {
-      id: Date.now(),
-      nombre: "Invitado Pendiente",
-      rol: "Miembro",
-      correo: newEmail,
-    };
-
-    setMembers([...members, newMember]);
-    setSuccessMessage("¡Invitación enviada con éxito a " + newEmail + "!");
-    setTimeout(() => setSuccessMessage(""), 3000);
-    setNewEmail("");
+    if (!familyName.trim()) return;
+    setError("");
+    try {
+      await createFamily(familyName.trim());
+      setSuccessMessage("¡Grupo familiar creado! Ahora eres el Jefe de Familia.");
+      setTimeout(() => setSuccessMessage(""), 3000);
+      setHasFamily(true);
+      setFamilyName("");
+      // Reload members
+      const data = await getFamilyMembers();
+      setMembers(data);
+    } catch (err) {
+      setError(err.message || "Error al crear grupo familiar");
+    }
   };
 
-  const handleDeleteMember = (id) => {
-    const member = members.find((m) => m.id === id);
-    setConfirmModal({ open: true, memberId: id, memberName: member.nombre });
-  };
-
-  const confirmDeleteMember = () => {
-    setMembers(members.filter((m) => m.id !== confirmModal.memberId));
-    setConfirmModal({ open: false, memberId: null, memberName: "" });
-    setSuccessMessage("Miembro eliminado correctamente");
-    setTimeout(() => setSuccessMessage(""), 3000);
-  };
-
-  const handlePromoteMember = (id) => {
-    setMembers(
-      members.map((m) =>
-        m.id === id ? { ...m, rol: "Administrador" } : m
-      )
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gray-100 p-8">
+        <p className="text-gray-700">Cargando grupo familiar...</p>
+      </main>
     );
-    setSuccessMessage("Miembro ascendido a Administrador");
-    setTimeout(() => setSuccessMessage(""), 3000);
-  };
+  }
 
   return (
     <main className="min-h-screen bg-gray-100 p-8">
@@ -81,21 +78,27 @@ const GrupoFamiliar = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 lg:col-span-1 h-fit">
+      {error && (
+        <div className="bg-red-100 border border-red-300 text-red-800 p-3 rounded-lg mb-4 text-sm" role="alert">
+          {error}
+        </div>
+      )}
+
+      {!hasFamily ? (
+        /* No family yet — show creation form */
+        <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 max-w-md mx-auto">
           <h2 className="text-lg font-bold text-gray-800 mb-4">
-            Invitar nuevo miembro
+            Aún no perteneces a un grupo familiar
           </h2>
           <p className="text-sm text-gray-700 mb-4">
-            Ingresa el correo de tu familiar para enviarle un enlace de acceso al grupo.
+            Crea un grupo familiar para invitar a tus familiares y gestionar las finanzas juntos.
           </p>
-
-          <form onSubmit={handleInviteMember}>
+          <form onSubmit={handleCreateFamily}>
             <input
-              type="email"
-              value={newEmail}
-              onChange={(e) => setNewEmail(e.target.value)}
-              placeholder="ejemplo@correo.com"
+              type="text"
+              value={familyName}
+              onChange={(e) => setFamilyName(e.target.value)}
+              placeholder="Nombre del grupo (ej. Familia Pérez)"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-2 focus:ring-indigo-500"
               required
             />
@@ -103,91 +106,59 @@ const GrupoFamiliar = () => {
               type="submit"
               className="w-full bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-700 transition"
             >
-              Enviar Invitación
+              Crear Grupo Familiar
             </button>
           </form>
         </section>
-
-        <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 lg:col-span-2">
-          <h2 className="text-lg font-bold text-gray-800 mb-4">
-            Miembros Actuales ({members.length})
-          </h2>
-
-          <div className="flex flex-col gap-3">
-            {members.map((member) => (
-              <div
-                key={member.id}
-                className="flex justify-between items-center p-4 border border-gray-100 rounded-lg bg-gray-50"
-              >
-                <div>
-                  <p className="font-bold text-gray-800">
-                    {member.nombre}
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    {member.correo}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      member.rol === "Jefe de Familia"
-                        ? "bg-purple-100 text-purple-700"
-                        : member.rol === "Administrador"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-green-100 text-green-700"
-                    }`}
-                  >
-                    {member.rol}
-                  </span>
-
-                  {member.rol !== "Jefe de Familia" && (
-                    <>
-                      <button
-                        onClick={() => handlePromoteMember(member.id)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600"
-                        aria-label="Ascender miembro"
-                      >
-                        Ascender
-                      </button>
-                      <button
-                        onClick={() => handleDeleteMember(member.id)}
-                        className="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600"
-                        aria-label="Eliminar miembro"
-                      >
-                        Eliminar
-                      </button>
-                    </>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      {confirmModal.open && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Confirmar eliminación</h3>
-            <p className="text-sm text-gray-700 mb-6">
-              ¿Deseas eliminar a <span className="font-semibold">{confirmModal.memberName}</span> del grupo familiar?
+      ) : (
+        /* Has a family — show members */
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 lg:col-span-1 h-fit">
+            <h2 className="text-lg font-bold text-gray-800 mb-4">
+              Información del grupo
+            </h2>
+            <p className="text-sm text-gray-700 mb-4">
+              Tu grupo familiar tiene {members.length} miembro(s). Los nuevos integrantes deben registrarse y ser agregados por el administrador de la base de datos por ahora.
             </p>
-            <div className="flex gap-3 justify-end">
-              <button
-                onClick={() => setConfirmModal({ open: false, memberId: null, memberName: "" })}
-                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition font-medium"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={confirmDeleteMember}
-                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition font-medium"
-              >
-                Confirmar
-              </button>
+          </section>
+
+          <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 lg:col-span-2">
+            <h2 className="text-lg font-bold text-gray-800 mb-4">
+              Miembros Actuales ({members.length})
+            </h2>
+
+            <div className="flex flex-col gap-3">
+              {members.map((member) => (
+                <div
+                  key={member.id}
+                  className="flex justify-between items-center p-4 border border-gray-100 rounded-lg bg-gray-50"
+                >
+                  <div>
+                    <p className="font-bold text-gray-800">
+                      {member.nombre}
+                    </p>
+                    <p className="text-sm text-gray-700">
+                      {member.correo}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        member.rol === "Jefe de Familia"
+                          ? "bg-purple-100 text-purple-700"
+                          : member.rol === "Administrador"
+                          ? "bg-blue-100 text-blue-700"
+                          : "bg-green-100 text-green-700"
+                      }`}
+                    >
+                      {member.rol}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
+          </section>
         </div>
       )}
     </main>

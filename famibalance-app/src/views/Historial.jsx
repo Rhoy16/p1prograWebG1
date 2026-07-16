@@ -1,55 +1,32 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { initialTransactions } from "../mocks/datosFinancieros";
-
-const months = [
-  { value: "", text: "Todos los meses" },
-  { value: "01", text: "Enero" },
-  { value: "02", text: "Febrero" },
-  { value: "03", text: "Marzo" },
-  { value: "04", text: "Abril" },
-  { value: "05", text: "Mayo" },
-  { value: "06", text: "Junio" },
-  { value: "07", text: "Julio" },
-  { value: "08", text: "Agosto" },
-  { value: "09", text: "Septiembre" },
-  { value: "10", text: "Octubre" },
-  { value: "11", text: "Noviembre" },
-  { value: "12", text: "Diciembre" },
-];
+import { getTransactions } from "../services/transactions.service";
+import { exportReport } from "../services/reports.service";
 
 const recordsPerPage = 10;
 
-const getMonth = (date) => {
-  const parts = date.split("/");
-  return parts[1] || "";
-};
-
 const Historial = () => {
   const [search, setSearch] = useState("");
-  const [month, setMonth] = useState("");
   const [category, setCategory] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [exporting, setExporting] = useState(false);
 
-  const [transactions] = useState(() => {
-    const savedTransactions = localStorage.getItem("movimientos");
-    if (savedTransactions) {
-      const parsed = JSON.parse(savedTransactions);
-      return parsed.map((t) =>
-        t.monto !== undefined
-          ? {
-              id: t.id,
-              name: t.nombre,
-              date: t.fecha,
-              category: t.categoria,
-              amount: t.monto,
-              type: t.tipo,
-            }
-          : t
-      );
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await getTransactions();
+        setTransactions(data);
+      } catch (err) {
+        setError(err.message || "Error al cargar el historial");
+      } finally {
+        setLoading(false);
+      }
     }
-    return initialTransactions;
-  });
+    load();
+  }, []);
 
   const categories = useMemo(() => {
     return [...new Set(transactions.map((t) => t.category))];
@@ -61,12 +38,11 @@ const Historial = () => {
     return transactions.filter((t) => {
       const name = (t.name || t.category).toLowerCase();
       const matchesText = name.includes(searchText);
-      const matchesMonth = month ? getMonth(t.date) === month : true;
       const matchesCategory = category ? t.category === category : true;
 
-      return matchesText && matchesMonth && matchesCategory;
+      return matchesText && matchesCategory;
     });
-  }, [search, category, month, transactions]);
+  }, [search, category, transactions]);
 
   const totalPages = Math.max(
     1,
@@ -84,27 +60,25 @@ const Historial = () => {
     setCurrentPage(1);
   };
 
-  const handleExportReport = () => {
-    const headers = ["Fecha", "Nombre", "Categoria", "Tipo", "Monto"];
-    const rows = visibleTransactions.map((t) => [
-      t.date,
-      t.name || t.category,
-      t.category,
-      t.type,
-      t.amount.toFixed(2),
-    ]);
-    const content = [headers, ...rows]
-      .map((row) => row.map((val) => `"${val}"`).join(","))
-      .join("\n");
-    const file = new Blob([content], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(file);
-    const link = document.createElement("a");
-
-    link.href = url;
-    link.download = "reporte-historial.csv";
-    link.click();
-    URL.revokeObjectURL(url);
+  const handleExportReport = async (format = 'csv') => {
+    setExporting(true);
+    setError("");
+    try {
+      await exportReport(format);
+    } catch (err) {
+      setError(err.message || "Error al exportar el reporte");
+    } finally {
+      setExporting(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-gray-100 p-8">
+        <p className="text-gray-700">Cargando historial...</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-gray-100 p-8">
@@ -126,6 +100,12 @@ const Historial = () => {
         </Link>
       </header>
 
+      {error && (
+        <div className="bg-red-100 border border-red-300 text-red-800 p-3 rounded-lg mb-4 text-sm" role="alert">
+          {error}
+        </div>
+      )}
+
       <section className="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
@@ -141,23 +121,6 @@ const Historial = () => {
               placeholder="Ej. mercado"
               className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500"
             />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Mes
-            </label>
-            <select
-              value={month}
-              onChange={(e) => handleFilterUpdate(() => setMonth(e.target.value))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-50 focus:ring-2 focus:ring-indigo-500"
-            >
-              {months.map((item) => (
-                <option key={item.text} value={item.value}>
-                  {item.text}
-                </option>
-              ))}
-            </select>
           </div>
 
           <div>
@@ -182,10 +145,21 @@ const Historial = () => {
 
           <div className="flex items-end">
             <button
-              onClick={handleExportReport}
-              className="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition"
+              onClick={() => handleExportReport('csv')}
+              disabled={exporting}
+              className="w-full bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700 transition disabled:opacity-50"
             >
-              Exportar visible
+              {exporting ? 'Exportando...' : 'Exportar CSV'}
+            </button>
+          </div>
+
+          <div className="flex items-end">
+            <button
+              onClick={() => handleExportReport('pdf')}
+              disabled={exporting}
+              className="w-full bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+            >
+              {exporting ? 'Exportando...' : 'Exportar PDF'}
             </button>
           </div>
         </div>

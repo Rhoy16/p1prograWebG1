@@ -1,29 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getCategories, createCategory } from "../services/categories.service";
 
 const Categorias = () => {
-  const [categories, setCategories] = useState(() => {
-    const savedCategories = localStorage.getItem("categorias");
-    return savedCategories
-      ? JSON.parse(savedCategories)
-      : ["Comida", "Transporte", "Estudios", "Servicios"];
-  });
-
+  const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const handleAddCategory = () => {
+  useEffect(() => {
+    async function load() {
+      try {
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        setError(err.message || "Error al cargar categorías");
+      } finally {
+        setLoading(false);
+      }
+    }
+    load();
+  }, []);
+
+  const handleAddCategory = async () => {
     if (!newCategory.trim()) return;
-    const newCategories = [...categories, newCategory];
-    setCategories(newCategories);
-    localStorage.setItem("categorias", JSON.stringify(newCategories));
-    setNewCategory("");
+    setError("");
+    try {
+      const created = await createCategory(newCategory.trim());
+      setCategories([...categories, created]);
+      setNewCategory("");
+    } catch (err) {
+      setError(err.message || "Error al crear categoría");
+    }
   };
 
-  const handleDeleteCategory = (category) => {
-    const newCategories = categories.filter((c) => c !== category);
-    setCategories(newCategories);
-    localStorage.setItem("categorias", JSON.stringify(newCategories));
-  };
+  if (loading) {
+    return (
+      <main className="min-h-screen p-8 bg-gray-100">
+        <p className="text-gray-700">Cargando categorías...</p>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen p-8 bg-gray-100">
@@ -38,6 +55,12 @@ const Categorias = () => {
           Volver al Dashboard
         </Link>
       </nav>
+
+      {error && (
+        <div className="bg-red-100 border border-red-300 text-red-800 p-3 rounded-lg mb-4 text-sm" role="alert">
+          {error}
+        </div>
+      )}
 
       <div className="flex gap-3 mb-6">
         <input
@@ -55,20 +78,21 @@ const Categorias = () => {
         </button>
       </div>
 
-      {categories.map((category) => (
+      {categories.map((cat) => (
         <div
-          key={category}
+          key={cat.id}
           className="bg-white p-4 rounded-xl shadow flex justify-between mb-2"
         >
-          <span>{category}</span>
-          <button
-            onClick={() => handleDeleteCategory(category)}
-            className="bg-red-500 text-white px-3 py-1 rounded"
-          >
-            Eliminar
-          </button>
+          <span>{cat.name}</span>
+          {cat.isCustom && (
+            <span className="text-xs text-gray-500 self-center">Personalizada</span>
+          )}
         </div>
       ))}
+
+      {categories.length === 0 && (
+        <p className="text-gray-500 text-sm">No hay categorías registradas. Crea una nueva arriba.</p>
+      )}
     </main>
   );
 };

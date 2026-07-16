@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { api } from '../services/api';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -11,9 +12,10 @@ const Register = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
 
-  const handleRegister = (e) => {
+const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
 
     // Validation 1: Check if passwords match
     if (password !== confirmPassword) {
@@ -27,10 +29,13 @@ const Register = () => {
       return;
     }
 
-    // Simulate registration
-    setSuccessMessage(`¡Cuenta creada con éxito para ${name}! Por favor, inicia sesión.`);
-    
-    setTimeout(() => navigate('/login'), 2000);
+    try {
+      await api.post('/auth/register', { name, email, password });
+      setSuccessMessage(`¡Cuenta creada con éxito para ${name}! Por favor, inicia sesión.`);
+      setTimeout(() => navigate('/login'), 2000);
+    } catch (err) {
+      setError(err.message || 'No se pudo crear la cuenta. Inténtalo de nuevo.');
+    }
   };
 
   return (
